@@ -4,6 +4,8 @@ import h5py
 
 #i think there is a problem with the begining, it hasnt written the first 500 rows
 # goes down and right (east and south) from point x,y
+#
+
 x = 51 # these are wrong way round
 y = -4
 
