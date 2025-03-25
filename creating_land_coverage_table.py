@@ -103,6 +103,9 @@ def parquet_file_to_database(input_file, output_file):
     table = table[table['coverage'] != 0]# mostly for ease of testing. will prob get rid of in final version
 
 
-    #print(table)
+    print(table)#for testing only
 
-    table.to_parquet(output_file, index=False)
+    #table.to_parquet(output_file, index=False)
+
+
+parquet_file_to_database('unit_tests/unit_test2.parquet',1)

@@ -12,11 +12,11 @@ import io
 import time
 from values import Values, water_values#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 import math
-
+ANGLE = 1#0.008333333333333333333
 
 def grid_loc(entry):
     point_set = list(entry.coords)
-    return set([(p[0] // (0.008333333333333333333) ,p[1]// (0.008333333333333333333)) for p in point_set])
+    return set([(p[0] // ANGLE ,p[1]// ANGLE) for p in point_set])
 #how many pixels it is from 0,0
 
 
@@ -72,7 +72,7 @@ def extract_speed(row):
 
 
 
-def make_csv_for_grid(remote_directory,query_type,coord_file):
+def make_csv_for_grid(remote_directory,coord_file):
 
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
@@ -110,7 +110,7 @@ def make_csv_for_grid(remote_directory,query_type,coord_file):
         mega_table.to_parquet(f'higher_granularity_output/pixel_to_road_speed{n}.parquet', index=False)
         n = n+1
 
-#finished n = 24
+
 
 # Configuration
 hostname = 'sherwood.cl.cam.ac.uk'  # or 'kinabalu.cl.cam.ac.uk'
@@ -131,10 +131,25 @@ def create_connection():
 
 
 
-start_time = time.time()
 
-make_csv_for_grid('/maps/sj514/overture/theme=transportation/type=segment','transport', "file_cords_of_transport.csv")
 
-end_time = time.time()
 
-print(end_time - start_time)
+def make_csv_for_grid2(f):
+    table = pq.read_table(f,columns=['geometry','subtype','road_surface','speed_limits','class'], filters=[[('class', 'in', list(Values.country_road_values.keys()))], [('subtype', 'in', ['rail','water'])]])
+    table = table.to_pandas()
+
+    table['speed_kph'] = table.apply(extract_speed, axis=1)#change this to a series of .map ?
+    table['geometry'] = table['geometry'].map(wkb.loads)
+    table['geometry'] = table['geometry'].map(grid_loc)
+
+
+    #need to write geometry as seperate columns for max efficiency!!!!!!!!!!
+
+    mega_table = table[['geometry','speed_kph']].explode('geometry')
+    print(mega_table)
+
+
+
+#make_csv_for_grid('/maps/sj514/overture/theme=transportation/type=segment', "file_cords_of_transport.csv")
+make_csv_for_grid2('road_table_unit_test3.parquet')
+
