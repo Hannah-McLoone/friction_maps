@@ -120,3 +120,5 @@ class water_values:
     }
 
     raw_water_speed = 19
+
+ANGLE = 1#0.008333333333333333333

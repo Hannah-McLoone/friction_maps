@@ -1,5 +1,6 @@
 from shapely.geometry import Polygon
-from values import ANGLE
+#from values import ANGLE
+ANGLE = 1
 import pandas as pd
 from shapely.wkb import dumps
 import pyarrow.parquet as pq
@@ -41,8 +42,8 @@ def generate_unit_test_data(id, shapes, subtypes):
 
 
 
-#shape = [(1.5, 3), (3, 1.5), (1.5, 0), (0, 1.5)]
-#generate_unit_test_data(1, [scale_tuples(shape)], subtypes = ['grass'])
+shape = [(1.5, 3), (3, 1.5), (1.5, 0), (0, 1.5)]
+generate_unit_test_data(1, [scale_tuples(shape)], subtypes = ['grass'])
 
 
 
