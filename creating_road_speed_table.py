@@ -67,12 +67,7 @@ def extract_speed(row):
 
 
 
-
-
-
-
-
-def make_csv_for_grid(remote_directory,coord_file):
+def create_tables_for_all_files(remote_directory,coord_file):
 
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
@@ -99,45 +94,14 @@ def make_csv_for_grid(remote_directory,coord_file):
             table = table.to_pandas()
         client.close()
 
-        table['speed_kph'] = table.apply(extract_speed, axis=1)#change this to a series of .map ?
-        table['geometry'] = table['geometry'].map(wkb.loads)
-        table['geometry'] = table['geometry'].map(grid_loc)
-
-
-        #need to write geometry as seperate columns for max efficiency!!!!!!!!!!
-
-        mega_table = table[['geometry','speed_kph']].explode('geometry')
+        mega_table = format_into_table(table)
         mega_table.to_parquet(f'higher_granularity_output/pixel_to_road_speed{n}.parquet', index=False)
         n = n+1
 
 
 
-# Configuration
-hostname = 'sherwood.cl.cam.ac.uk'  # or 'kinabalu.cl.cam.ac.uk'
-port = 22  # Default SSH port
-username = 'hm708'  # Replace with your actual CSRid
-private_key_path = '/Users/hanna/.ssh/id_rsa'  # Path to your private key file
 
-def create_connection():
-    try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
-        client.connect(hostname, port=port, username=username, pkey=private_key)
-        return client
-    except Exception as e:
-        print(f'An error occurred: {e}')
-
-
-
-
-
-
-
-def make_csv_for_grid2(f):
-    table = pq.read_table(f,columns=['geometry','subtype','road_surface','speed_limits','class'], filters=[[('class', 'in', list(Values.country_road_values.keys()))], [('subtype', 'in', ['rail','water'])]])
-    table = table.to_pandas()
-
+def format_into_table(table):
     table['speed_kph'] = table.apply(extract_speed, axis=1)#change this to a series of .map ?
     table['geometry'] = table['geometry'].map(wkb.loads)
     table['geometry'] = table['geometry'].map(grid_loc)
@@ -146,10 +110,15 @@ def make_csv_for_grid2(f):
     #need to write geometry as seperate columns for max efficiency!!!!!!!!!!
 
     mega_table = table[['geometry','speed_kph']].explode('geometry')
-    print(mega_table)
+    return(mega_table)
 
 
 
-#make_csv_for_grid('/maps/sj514/overture/theme=transportation/type=segment', "file_cords_of_transport.csv")
-make_csv_for_grid2('road_table_unit_test3.parquet')
+def turn_overture_into_road_table(f):
+    table = pq.read_table(f,columns=['geometry','subtype','road_surface','speed_limits','class'], filters=[[('class', 'in', list(Values.country_road_values.keys()))], [('subtype', 'in', ['rail','water'])]])
+    table = table.to_pandas()
+    return format_into_table(table)
+
+
+
 
