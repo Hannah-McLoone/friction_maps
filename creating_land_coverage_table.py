@@ -82,7 +82,7 @@ def land_speed(subtype):#,given_class):
 
 
 
-def parquet_file_to_database(input_file, output_file):
+def parquet_file_to_database(input_file, output_file):##kept around as backup
     table = pq.read_table(input_file).to_pandas()
 
     table['subtype'] = table['subtype'].map(land_speed)
@@ -102,10 +102,32 @@ def parquet_file_to_database(input_file, output_file):
     #im not sure whether this is worth it though because i would only look at each 0 pixel once anyway. saves space, not sure about time
     table = table[table['coverage'] != 0]# mostly for ease of testing. will prob get rid of in final version
 
-
-    print(table)#for testing only
-
-    #table.to_parquet(output_file, index=False)
+    table.to_parquet(output_file, index=False)
 
 
-parquet_file_to_database('unit_tests/unit_test2.parquet',1)
+
+def format_into_land_table(table):
+    table['subtype'] = table['subtype'].map(land_speed)
+    table.rename(columns={'subtype': 'speed'}, inplace=True)
+
+    #this line is about 5 percent of time
+    table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(hex_to_wkb), geometry='geometry', crs="EPSG:4326")
+
+    table[['pixel', 'coverage']] = table.apply(lambda row: pd.Series(generate_coord_overlap(row['bbox'], row['geometry'])), axis=1)
+    #drop geometry column
+
+    table = table.drop(['bbox','geometry'], axis = 1)
+
+    table = table.explode(['pixel', 'coverage'])
+
+    #if i wanted to drop the pixels with 0 coverage it would be at this point.
+    #im not sure whether this is worth it though because i would only look at each 0 pixel once anyway. saves space, not sure about time
+    table = table[table['coverage'] != 0]# mostly for ease of testing. will prob get rid of in final version
+
+
+    return table
+
+def turn_overture_into_land_table(input_file, output_file):
+    table = pq.read_table(input_file).to_pandas()
+    format_into_land_table(table).to_parquet(output_file, index=False)
+
