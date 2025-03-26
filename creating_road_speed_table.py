@@ -94,14 +94,14 @@ def create_tables_for_all_files(remote_directory,coord_file):
             table = table.to_pandas()
         client.close()
 
-        mega_table = format_into_table(table)
+        mega_table = format_into_road_table(table)
         mega_table.to_parquet(f'higher_granularity_output/pixel_to_road_speed{n}.parquet', index=False)
         n = n+1
 
 
 
 
-def format_into_table(table):
+def format_into_road_table(table):
     table['speed_kph'] = table.apply(extract_speed, axis=1)#change this to a series of .map ?
     table['geometry'] = table['geometry'].map(wkb.loads)
     table['geometry'] = table['geometry'].map(grid_loc)
@@ -117,7 +117,7 @@ def format_into_table(table):
 def turn_overture_into_road_table(f):
     table = pq.read_table(f,columns=['geometry','subtype','road_surface','speed_limits','class'], filters=[[('class', 'in', list(Values.country_road_values.keys()))], [('subtype', 'in', ['rail','water'])]])
     table = table.to_pandas()
-    return format_into_table(table)
+    return format_into_road_table(table)
 
 
 

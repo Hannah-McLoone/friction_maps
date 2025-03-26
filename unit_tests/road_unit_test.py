@@ -10,7 +10,7 @@ import json
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))# fix this
-from creating_road_speed_table import format_into_table
+from creating_road_speed_table import format_into_road_table
 
 
 
@@ -27,7 +27,6 @@ def generate_unit_test_data(shapes, subtypes, road_surfaces,speed_limits,given_c
     return table
 
 
-
 def compare_dataframes_ignore_order(df1, df2):
     # Sort both by all columns (as tuple), reset index, and compare
     df1_sorted = df1.sort_values(by=list(df1.columns)).reset_index(drop=True)
@@ -37,21 +36,24 @@ def compare_dataframes_ignore_order(df1, df2):
 
 
 
+#------------------------------------------------------------------------------------------------
+
+
 shape = [(0.5, 0.5), (2.5, 0.5)]
 unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_table(unit_test_data)
+df1 = format_into_road_table(unit_test_data)
 df2 = pd.DataFrame({'geometry':[(0,0),(2,0)], 'speed_kph':[97,97]})
 print(compare_dataframes_ignore_order(df1, df2))
 
 
 shape = [(1, 0.5), (2.5, 0.5)]
 unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_table(unit_test_data)
+df1 = format_into_road_table(unit_test_data)
 df2 = pd.DataFrame({'geometry':[(1,0),(2,0)], 'speed_kph':[97,97]})
 print(compare_dataframes_ignore_order(df1, df2))
 
 shape = [(0.5, 0.5),(1.3, 0.5),(1.6, 0.5), (2.5, 0.5)]
 unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_table(unit_test_data)
+df1 = format_into_road_table(unit_test_data)
 df2 = pd.DataFrame({'geometry':[(0,0),(1,0),(2,0)], 'speed_kph':[97,97,97]})
 print(compare_dataframes_ignore_order(df1, df2))
