@@ -36,7 +36,7 @@ def extract_speed(row):
         
         
 
-        if row['subtype'] is not None:
+        if row['subtype'] is not None and row['subtype'] is not 'road':
             t = {'rail':Values.railspeed,'water':Values.waterspeed}
             return t[row['subtype']]
         
@@ -53,7 +53,7 @@ def extract_speed(row):
 
     max_speed = row['speed_limits'][0].get('max_speed', {})  # Safely get 'max_speed' dictionary
 
-    if max_speed is not None:
+    if max_speed is not None and max_speed != {}:
         value = max_speed.get('value')
         unit = max_speed.get('unit')
 
@@ -63,7 +63,7 @@ def extract_speed(row):
             return value * 1.60934
         
     return 0
-
+#ok well this seems like a flaw. if road speed contains one thing that is none
 
 
 
