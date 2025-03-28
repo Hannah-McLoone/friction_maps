@@ -1,6 +1,3 @@
-print(1)
-
-
 import csv
 import random
 

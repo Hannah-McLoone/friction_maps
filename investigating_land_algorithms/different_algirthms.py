@@ -1,7 +1,6 @@
 """
-why are there nones in the table?
-df = pd.read_parquet("delete.parquet")
-geometry_list = df["bbox"].tolist()
+this is the code i used for producing the land speed values for different randomly selected area in the amazon
+it writes the values for each algorithm to a different csv, which i later combined to run tests on
 """
 
 from shapely import wkb
@@ -18,20 +17,6 @@ import csv
 def hex_to_wkb(hex_string):
     binary_wkb = hex_string.hex()
     return wkb.loads(binary_wkb)
-
-
-
-
-def read_and_format_numbers(filename="test_points_of_amazon_land.csv"):
-    formatted_numbers = []
-    unformatted_numbers = []
-    with open(filename, mode="r") as file:
-        reader = csv.reader(file)
-        next(reader)  # Skip header
-        for row in reader:
-            unformatted_numbers.append(row)
-            formatted_numbers.append(f"[{float(row[0])}, {float(row[1])}]")
-    return formatted_numbers, unformatted_numbers
 
 
 
@@ -57,7 +42,7 @@ def best_land_algorithm(filtered_df, pixel):
 
 
 
-def worse_land_algorithm(filtered_df):
+def adequate_land_algorithm(filtered_df):
     total_speed = 0
     total = sum(filtered_df["geometry"])
     if total != 0:
@@ -66,7 +51,7 @@ def worse_land_algorithm(filtered_df):
     return 1
 
 
-def shit_land_algorithm(filtered_df):
+def worst_land_algorithm(filtered_df):
     filtered_df = filtered_df[filtered_df["geometry"] != 0]
     if filtered_df.empty:
         print('!!!!')
@@ -74,6 +59,16 @@ def shit_land_algorithm(filtered_df):
     return min(filtered_df["speed"] )
 
 
+def read_and_format_numbers(filename="test_points_of_amazon_land.csv"):
+    formatted_numbers = []
+    unformatted_numbers = []
+    with open(filename, mode="r") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header
+        for row in reader:
+            unformatted_numbers.append(row)
+            formatted_numbers.append(f"[{float(row[0])}, {float(row[1])}]")
+    return formatted_numbers, unformatted_numbers
 
 angle = 0.008333333333333333333
 no_land_data = 1
@@ -82,7 +77,7 @@ pixels, p2 = read_and_format_numbers()
 start_time = time.time()
 speeds = []
 
-with open('shit_land_algo_amazon3.csv', 'w') as f:
+with open('adequate_land_algorithm.csv', 'w') as f:
     for n in range (745,1000):
 
         query = f"""
@@ -103,18 +98,13 @@ with open('shit_land_algo_amazon3.csv', 'w') as f:
         land_df = duckdb.query(query).df()
 
         xangle = int(p2[n][0]) * angle
-        print(xangle)
         yangle = int(p2[n][1]) * angle
 
 
         land_df['geometry'] = gpd.GeoDataFrame(land_df['geometry'].apply(hex_to_wkb), geometry='geometry', crs="EPSG:4326")
         pixel = Polygon([(xangle,yangle), (xangle, yangle + angle),  (xangle + angle, yangle + angle),  (xangle + angle, yangle)])
         land_df['geometry'] = land_df['geometry'].apply(lambda geom: pixel.intersection(geom).area)#get rid of .area for better version
-        f.write(f"{pixels[n]},{shit_land_algorithm(land_df)}\n")
-
-
-
-
+        f.write(f"{pixels[n]},{adequate_land_algorithm(land_df)}\n")
 
 
 print(time.time() - start_time)
