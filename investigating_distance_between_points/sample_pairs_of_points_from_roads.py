@@ -2,21 +2,15 @@ import pandas as pd
 
 from shapely import wkb
 import paramiko
-import os
-import re
 import pyarrow.parquet as pq
 import pyarrow.dataset as ds
-import io
 import time
-from filter_x_y import filter_xy, filter_by_area_deprecated
 from values import Values, water_values
-import math
 
 
 # --select 1000 roads from each file
 # get set of interpoint distances - in angles and km
 #       record whether road, rail or water
-# plot
 
 
 
@@ -31,8 +25,6 @@ def test(remote_directory,coord_file):
 
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
-
-
 
 
 
