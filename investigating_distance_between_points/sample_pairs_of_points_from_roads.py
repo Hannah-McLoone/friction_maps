@@ -14,7 +14,7 @@ from values import Values, water_values
 
 
 
-def temp(entry):
+def select_points_from_single_road(entry):
     point_set = list(entry.coords)
     return [(point_set[i], point_set[i+1]) for i in range(0, min(5,len(point_set) - 1))]
 
@@ -48,7 +48,7 @@ def test(remote_directory,coord_file):
 
         sampled_df = table.sample(n=100, random_state=42)
         sampled_df['geometry'] = sampled_df['geometry'].map(wkb.loads)
-        sampled_df['geometry'] = sampled_df['geometry'].map(temp)
+        sampled_df['geometry'] = sampled_df['geometry'].map(select_points_from_single_road)
         mega_table = sampled_df.explode('geometry')
 
         mega_table.to_csv('sample_of_road_points.csv', mode='a', index=False, header=not pd.io.common.file_exists(file_path))
