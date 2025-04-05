@@ -7,18 +7,18 @@ import h5py
 #
 #
 
-x = 51 # these are wrong way round
-y = -4
+x = 1 # these are wrong way round
+y = -1
 
 
-start_row = int((90-x) / 0.008333333333333333333 )
-end_row = start_row + 4000
-start_col = int((180+y) / 0.008333333333333333333 )
-end_col = start_col + 4000
+start_row =  int((90-x) / 0.008333333333333333333 )
+end_row = start_row + 200
+start_col =  int((180+y) / 0.008333333333333333333 )
+end_col = start_col + 200
 
 
 # Open the existing HDF5 file in read mode
-with h5py.File('my_data2.h5', 'r') as hdf5_file:
+with h5py.File('please_please_please.h5', 'r') as hdf5_file:
     # Access the data variable
     data_var = hdf5_file['data']
     

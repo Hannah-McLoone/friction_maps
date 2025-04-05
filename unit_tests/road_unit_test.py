@@ -35,42 +35,6 @@ def compare_dataframes_ignore_order(df1, df2):
     return df1_sorted.equals(df2_sorted)
 
 
-
-#------------------------------------------------------------------------------------------------
-
-#testing that a single road is assigned to the correct squares
-
-shape = [(0.5, 0.5), (2.5, 0.5)]
-unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_road_table(unit_test_data)
-df2 = pd.DataFrame({'geometry':[(0,0),(2,0)], 'speed_kph':[97,97]})
-print(compare_dataframes_ignore_order(df1, df2))
-
-
-shape = [(1, 0.5), (2.5, 0.5)]
-unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_road_table(unit_test_data)
-df2 = pd.DataFrame({'geometry':[(1,0),(2,0)], 'speed_kph':[97,97]})
-print(compare_dataframes_ignore_order(df1, df2))
-
-shape = [(0.5, 0.5),(1.3, 0.5),(1.6, 0.5), (2.5, 0.5)]
-unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
-df1 = format_into_road_table(unit_test_data)
-df2 = pd.DataFrame({'geometry':[(0,0),(1,0),(2,0)], 'speed_kph':[97,97,97]})
-print(compare_dataframes_ignore_order(df1, df2))
-
-
-#------------------------------------------------------------------------------------------------
-#motorway is 113
-#testing world with multiple roads and speeds
-shape1 = [(0.8, 1.8),(1.7, 2.2),(2.2, 1.8)]
-shape2 = [(0.5, 1.5),(1.3, 1.5),(1.6, 1.5), (2.5, 1.5)]
-shape3 = [(0.5, 0.5),(1.3, 0.5),(1.6, 0.8), (1.6, 1.2),(2.5, 1.2)]
-unit_test_data = generate_unit_test_data([scale_tuples(shape1),scale_tuples(shape2),scale_tuples(shape3)], ['road','road','road'], [None,None,None],[None,None,None],['motorway','primary','primary'])
-df1 = format_into_road_table(unit_test_data)
-df2 = pd.DataFrame({'geometry':[(0,0),(1,0),(0,1),(0,1),(1,1),(1,1),(2,1),(2,1),(2,1),(1,2)], 'speed_kph':[97,97,97,113,97,97,97,97,113,113]})
-print(compare_dataframes_ignore_order(df1, df2))
-
 #--------------------------------------------------------------------------------------------------
 #testing that a correct speed is assigned to each road point
 
@@ -122,3 +86,39 @@ print(compare_dataframes_ignore_order(df1, df2))
 
 
 #what about speed limit that is None???????????????????????? does this happen
+
+
+#------------------------------------------------------------------------------------------------
+
+#testing that a single road is assigned to the correct squares
+
+shape = [(0.5, 0.5), (2.5, 0.5)]
+unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
+df1 = format_into_road_table(unit_test_data)
+df2 = pd.DataFrame({'geometry':[(0,0),(2,0)], 'speed_kph':[97,97]})
+print(compare_dataframes_ignore_order(df1, df2))
+
+
+shape = [(1, 0.5), (2.5, 0.5)]
+unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
+df1 = format_into_road_table(unit_test_data)
+df2 = pd.DataFrame({'geometry':[(1,0),(2,0)], 'speed_kph':[97,97]})
+print(compare_dataframes_ignore_order(df1, df2))
+
+shape = [(0.5, 0.5),(1.3, 0.5),(1.6, 0.5), (2.5, 0.5)]
+unit_test_data = generate_unit_test_data([scale_tuples(shape)], ['road'], [None],[None],['primary'])
+df1 = format_into_road_table(unit_test_data)
+df2 = pd.DataFrame({'geometry':[(0,0),(1,0),(2,0)], 'speed_kph':[97,97,97]})
+print(compare_dataframes_ignore_order(df1, df2))
+
+
+#------------------------------------------------------------------------------------------------
+#motorway is 113
+#testing world with multiple roads and speeds
+shape1 = [(0.8, 1.8),(1.7, 2.2),(2.2, 1.8)]
+shape2 = [(0.5, 1.5),(1.3, 1.5),(1.6, 1.5), (2.5, 1.5)]
+shape3 = [(0.5, 0.5),(1.3, 0.5),(1.6, 0.8), (1.6, 1.2),(2.5, 1.2)]
+unit_test_data = generate_unit_test_data([scale_tuples(shape1),scale_tuples(shape2),scale_tuples(shape3)], ['road','road','road'], [None,None,None],[None,None,None],['motorway','primary','primary'])
+df1 = format_into_road_table(unit_test_data)
+df2 = pd.DataFrame({'geometry':[(0,0),(1,0),(0,1),(0,1),(1,1),(1,1),(2,1),(2,1),(2,1),(1,2)], 'speed_kph':[97,97,97,113,97,97,97,97,113,113]})
+print(compare_dataframes_ignore_order(df1, df2))
