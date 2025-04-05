@@ -6,17 +6,20 @@ import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 import time
 from values import Values, water_values
-
+import random
 
 # --select 1000 roads from each file
 # get set of interpoint distances - in angles and km
 #       record whether road, rail or water
 
 
+#part 9 - i=10
 
 def select_points_from_single_road(entry):
     point_set = list(entry.coords)
-    return [(point_set[i], point_set[i+1]) for i in range(0, min(5,len(point_set) - 1))]
+    #return [(point_set[i], point_set[i+1]) for i in range(0, min(5,len(point_set) - 1))]
+    i = random.randint(0, len(point_set) - 2)
+    return (point_set[i], point_set[i + 1])
 
 
 
@@ -29,6 +32,7 @@ def test(remote_directory,coord_file):
 
 
     i = 0
+    names_list = [names_list[0],names_list[1],names_list[2],names_list[3],names_list[9]]
 
     for file_name in names_list:
         i = i + 1
@@ -41,24 +45,28 @@ def test(remote_directory,coord_file):
 
         # Use PyArrow to read the dataset and filter it
         with remote_file as f:
-            table = pq.read_table(f,columns=['geometry','class', 'subtype'], filters=[[('class', 'in', list(Values.country_road_values.keys()))], [('subtype', 'in', ['rail','water'])]])
+            table = pq.read_table(f,columns=['geometry','class', 'subtype'], filters=[[('class', 'in', list(Values.country_road_values.keys()))]   ])#, [('subtype', 'in', ['rail','water'])]])
 
         table = table.to_pandas()
         client.close()
 
-        sampled_df = table.sample(n=100, random_state=42)
+        sampled_df = table.sample(n=int(len(table) / 100), random_state=42)
         sampled_df['geometry'] = sampled_df['geometry'].map(wkb.loads)
         sampled_df['geometry'] = sampled_df['geometry'].map(select_points_from_single_road)
-        mega_table = sampled_df.explode('geometry')
+        #mega_table = sampled_df.explode('geometry')
 
-        mega_table.to_csv('sample_of_road_points.csv', mode='a', index=False, header=not pd.io.common.file_exists(file_path))
-
-
+        sampled_df.to_csv('amazon_sample.csv', mode='a', index=False, header=not pd.io.common.file_exists(file_path))
 
 
+# theres 2243540 in file 1
+#2243540 / 10000 =~= 200
 
-empty_df = pd.DataFrame()
-empty_df.to_csv('sample_of_road_points.csv', index=False)
+
+#empty_df = pd.DataFrame()
+#empty_df.to_csv('amazon_sample.csv', index=False)#no!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+#go from 4
 
 
 

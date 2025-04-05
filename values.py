@@ -89,6 +89,8 @@ class Land_values:
         "tree": 5,              # Slow, due to obstacles
         "wetland": 4,           # Slow, difficult to traverse
 
+
+        #land cover subclass
         "barren": 12,           # Fast speed, generally open terrain
         "crop": 14,             # Fast speed, open agricultural fields
         "forest": 5,            # Slow due to dense vegetation
