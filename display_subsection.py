@@ -14,7 +14,7 @@ end_col = start_col + 500
 
 
 # Open the existing HDF5 file in read mode
-with h5py.File('road_fricion_map_question_mark.h5', 'r') as hdf5_file:
+with h5py.File('road_fricion_map.h5', 'r') as hdf5_file:
     # Access the data variable
     data_var = hdf5_file['data']
     

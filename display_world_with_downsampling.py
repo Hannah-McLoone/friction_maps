@@ -2,11 +2,11 @@ import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 
-h5_file = "land_friction_map.h5"
+h5_file = "road_fricion_map_question_mark.h5"
 
 # Sampling intervals
-row_stride = 10  # Adjust based on desired downsampling
-col_stride = 10 # Adjust based on desired downsampling
+row_stride = 11  # Adjust based on desired downsampling
+col_stride = 11 # Adjust based on desired downsampling
 
 with h5py.File(h5_file, "r") as f:
     # Automatically retrieve the first dataset
@@ -17,6 +17,8 @@ with h5py.File(h5_file, "r") as f:
     
     # Downsample by selecting every 'row_stride'th row and 'col_stride'th column
     downsampled_data = dataset[::row_stride, ::col_stride]
+
+    downsampled_data = np.minimum(downsampled_data, 100)
 
 # Plot the downsampled data as a heatmap
 plt.imshow(downsampled_data, cmap='viridis', aspect='auto')

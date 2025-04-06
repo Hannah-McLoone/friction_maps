@@ -1,10 +1,5 @@
 #uses land_cover. do i want land cover or land???
 
-"""
-the code i am working on in the newer version
-"""
-
-
 import pandas as pd
 import paramiko
 import pyarrow.parquet as pq
@@ -17,11 +12,11 @@ from values import ANGLE
 import geopandas as gpd
 from shapely import wkb
 from shapely.geometry import Polygon
+import sys
 
 
-#change this from hex string!!!!!!
-def hex_to_wkb(hex_string):
-    binary_wkb = hex_string.hex()
+def load_geometry_from_wkb_bytes(wkb_bytes):
+    binary_wkb = wkb_bytes.hex()
     return wkb.loads(binary_wkb)
 
 
@@ -81,53 +76,55 @@ def land_speed(subtype):#,given_class):
     return Land_values.land_type_speeds.get(subtype, 1)
 
 
-
-def parquet_file_to_database(input_file, output_file):##kept around as backup
-    table = pq.read_table(input_file).to_pandas()
-
-    table['subtype'] = table['subtype'].map(land_speed)
-    table.rename(columns={'subtype': 'speed'}, inplace=True)
-
-    #this line is about 5 percent of time
-    table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(hex_to_wkb), geometry='geometry', crs="EPSG:4326")
-
-    table[['pixel', 'coverage']] = table.apply(lambda row: pd.Series(generate_coord_overlap(row['bbox'], row['geometry'])), axis=1)
-    #drop geometry column
-
-    table = table.drop(['bbox','geometry'], axis = 1)
-
-    table = table.explode(['pixel', 'coverage'])
-
-    #if i wanted to drop the pixels with 0 coverage it would be at this point.
-    #im not sure whether this is worth it though because i would only look at each 0 pixel once anyway. saves space, not sure about time
-    table = table[table['coverage'] != 0]# mostly for ease of testing. will prob get rid of in final version
-
-    table.to_parquet(output_file, index=False)
-
-
-
 def format_into_land_table(table):
     table['subtype'] = table['subtype'].map(land_speed)
     table.rename(columns={'subtype': 'speed'}, inplace=True)
 
     #this line is about 5 percent of time
-    table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(hex_to_wkb), geometry='geometry', crs="EPSG:4326")
+    table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(load_geometry_from_wkb_bytes), geometry='geometry', crs="EPSG:4326")
 
+    #roughly the other 95 percent
     table[['pixel', 'coverage']] = table.apply(lambda row: pd.Series(generate_coord_overlap(row['bbox'], row['geometry'])), axis=1)
-    #drop geometry column
 
     table = table.drop(['bbox','geometry'], axis = 1)
-
     table = table.explode(['pixel', 'coverage'])
-
-    #if i wanted to drop the pixels with 0 coverage it would be at this point.
-    #im not sure whether this is worth it though because i would only look at each 0 pixel once anyway. saves space, not sure about time
-    table = table[table['coverage'] != 0]# mostly for ease of testing. will prob get rid of in final version
-
+    table = table[table['coverage'] != 0]
 
     return table
 
-def turn_overture_into_land_table(input_file, output_file):
-    table = pq.read_table(input_file).to_pandas()
-    format_into_land_table(table).to_parquet(output_file, index=False)
 
+def parquet_file_to_database(input_file, output_file, chunk_size=100): # more ram efficient to be readig and processing in chunks
+    reader = pq.ParquetFile(input_file)
+    
+    first_chunk = True
+    writer = None
+    
+    for batch in reader.iter_batches(batch_size=chunk_size):
+        table = batch.to_pandas()
+        
+        if {'subtype', 'geometry', 'bbox'}.issubset(table.columns):
+            table = table[['subtype', 'geometry', 'bbox']]
+        else:
+            raise ValueError("Missing required columns in the input file")
+        
+        table = format_into_land_table(table)
+        
+        table_arrow = pa.Table.from_pandas(table)
+        
+        if first_chunk:
+            writer = pq.ParquetWriter(output_file, table_arrow.schema)
+            first_chunk = False
+        
+        writer.write_table(table_arrow)
+    
+    if writer:
+        writer.close()
+
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python script <arg1> <arg2>")
+    else:
+        arg1, arg2 = sys.argv[1], sys.argv[2]
+        parquet_file_to_database(arg1, arg2)
