@@ -5,7 +5,7 @@ import numpy as np
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))# fix this
-from querying_pixel import create_friction_map_for_section
+from querying_road_pixel import create_friction_map_for_section
 
 
 # Write to Parquet

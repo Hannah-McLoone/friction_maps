@@ -124,3 +124,14 @@ class water_values:
     raw_water_speed = 19
 
 ANGLE = 1#0.008333333333333333333
+
+
+
+#forest - 2
+#fell - 2
+#glacier - 0
+#cliff - 0
+#mountain range - 1
+#peak - 0
+#beach =/= sand
+# grass could be high - 30? moss?
