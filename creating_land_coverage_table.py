@@ -32,7 +32,7 @@ def generate_coord_overlap(bbox, geometry):
     flat_geometries = np.column_stack([x_grid.ravel(), y_grid.ravel()])
 
     # Create the corner coordinates for the polygons
-    x_vals, y_vals = flat_geometries[:, 0] * ANGLE, flat_geometries[:, 1] * ANGLE
+    x_vals, y_vals = flat_geometries[:, 0] * ANGLE, flat_geometries[:, 1] * ANGLE# line that needs changing!!!!!!!!!!!!!!!!!!!!!!
     x0, y0 = x_vals, y_vals
     x1, y1 = x_vals, y_vals + ANGLE
     x2, y2 = x_vals + ANGLE, y_vals + ANGLE
@@ -65,7 +65,7 @@ def generate_coord_overlap(bbox, geometry):
 
     # Extract pixel coordinates and areas
     #takes the bottom left corner of the pixel as the identifier. is this the same as roads? Yes, yes it is
-    pixels = np.array([coords[0] for coords in polygons_array])
+    pixels = np.array([coords[0]/ANGLE for coords in polygons_array]) # this/ANGLE is the latest addition. to make it indexed by integer. change if i want to go back
     
     return pixels, intersection_areas.values  # Convert the result to a numpy array
 

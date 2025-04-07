@@ -4,27 +4,25 @@ import numpy as np
 import time
 import h5py
 
+#this rewquires changing geometry to pixel in the road pre-processing.!!!!!!!!! 
 
 """
-need to rotate this 90 degrees anticlockwise!!!!!!!
-reformat my arrays rows and columns?
+currently rotate this 90 degrees anticlockwis - reformat my arrays rows and columns?
+
+polish up by making angle into ANGLE
+making it neater to call
 """
 
-def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename):
+def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
     resolution = 1 # how many km in square
     angle = 0.008333333333333333333 / resolution
 
-    #x_n = 360 / angle # 500
-    #y_n = 500
-    #xangle = -180
-    #yangle = 51
     duckdb.query("PRAGMA threads=8") 
 
 
 
     i_vals = np.arange(int(xangle //angle), int(xangle //angle + x_n))
     j_vals = np.arange(int(yangle //angle), int(yangle //angle + y_n))
-    #was line here to multiply both by angle  - angle(float) indexing rather than pixel
     x_grid, y_grid = np.meshgrid(i_vals, j_vals, indexing="ij")
 
     pixels = np.stack([x_grid, y_grid], axis=-1)
@@ -42,7 +40,7 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename):
 
     #change to higher granularity output if i want that
     query = f"""
-    SELECT input_pixels.pixel, COALESCE(SUM(read_parquet.speed * read_parquet.coverage) / NULLIF(SUM(read_parquet.coverage), 0), 0) AS weighted_avg_speed
+    {selection}
     FROM input_pixels
     LEFT JOIN read_parquet('{filename}*.parquet') AS read_parquet
     ON input_pixels.pixel = read_parquet.pixel
@@ -55,7 +53,7 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename):
     def break_list_into_sublists_numpy(array, n):
         return np.array_split(array, n)
 
-    result = break_list_into_sublists_numpy(np.array(result['weighted_avg_speed']), y_n)
+    result = break_list_into_sublists_numpy(np.array(result['speed']), y_n)
 
 
     return np.array(result)
@@ -75,6 +73,9 @@ if __name__ == "__main__":
     rows = int(180 / 0.008333333333333333333)
     cols = int(360 / 0.008333333333333333333)
 
+    selection1 = "SELECT input_pixels.pixel, COALESCE(SUM(read_parquet.speed * read_parquet.coverage) / NULLIF(SUM(read_parquet.coverage), 0), 0) AS speed"
+    selection2 = "SELECT input_pixels.pixel, COALESCE(MAX(read_parquet.speed_kph), 0) AS speed"
+
     # Create HDF5 file
     with h5py.File('temp.h5', 'w') as hdf5_file:
         # Create datasets with specified dimensions and chunking
@@ -82,7 +83,7 @@ if __name__ == "__main__":
 
         while y2_angle > -90:
             print(y2_angle)
-            result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'/maps/hm708/processed_land')  # Assuming this function is defined elsewhere
+            result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'/maps/hm708/processed_land', selection1)  # Assuming this function is defined elsewhere
             result_rows, cols = result_array.shape
             y_angle = y2_angle
             y2_angle = y2_angle - 500 * 0.008333333333333333333
