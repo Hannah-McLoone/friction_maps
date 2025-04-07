@@ -4,7 +4,7 @@ from values import Values
 from creating_road_speed_table import format_into_road_table
 from create_connection import create_connection
 
-def create_tables_for_all_files_using_connection(remote_directory,coord_file):
+def create_tables_for_all_files_using_connection(remote_directory,coord_file): #coord file contains list of names
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
 

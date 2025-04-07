@@ -7,7 +7,8 @@ class Values:
     country_road_values = {
         'motorway': 113,  # 70 mph → 113 kph
         'primary': 97,    # 60 mph → 97 kph
-        'unclassified': None,  
+        'unclassified': None, 
+        'unknown': None,  
         'secondary': 80,  # 50 mph → 80 kph
         'tertiary': 64,   # 40 mph → 64 kph
         'service': 32     # 20 mph → 32 kph

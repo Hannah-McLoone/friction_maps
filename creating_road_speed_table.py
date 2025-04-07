@@ -17,41 +17,34 @@ def grid_loc(entry):#how many pixels it is from 0,0
 
 
 def extract_speed(row):
-    if row['speed_limits'] is None or type(row['speed_limits']) == 'NoneType' or isinstance(row['speed_limits'], (list, dict)) and not row['speed_limits']:  # Check if speed is None or empty
-        # implicit speed - on types of road
-        if row['class'] is not None:
-            return Values.country_road_values[row['class']]
-        
-        
+    if row['speed_limits'] != None:  # Check if there is a speed limit
+        max_speed = row['speed_limits'][0].get('max_speed', {})  # Safely get 'max_speed' dictionary
 
-        if row['subtype'] is not None and row['subtype'] is not 'road':
-            t = {'rail':Values.railspeed,'water':Values.waterspeed}
-            return t[row['subtype']]
-        
+        if max_speed != None and max_speed != {}:
+            value = max_speed.get('value')
+            unit = max_speed.get('unit')
 
-        #implicit speed on road surface
-        if row['road_surface'] is not None:
-            surface = row['road_surface'][0].get('value', {})
-            return Values.speeds_of_features[surface]
-        
-        return 0
+            if unit == 'kph':
+                return value
+            else:
+                return value * 1.60934
 
 
+    # implicit speed - on types of road
+    if row['class'] != None and row['class'] != 'unclassified' and row['class'] != 'unknown':
+        return Values.country_road_values[row['class']]
+    
+    if row['subtype'] != None and row['subtype'] != 'road':
+        t = {'rail':Values.railspeed,'water':Values.waterspeed}
+        return t[row['subtype']]
+    
 
-
-    max_speed = row['speed_limits'][0].get('max_speed', {})  # Safely get 'max_speed' dictionary
-
-    if max_speed is not None and max_speed != {}:
-        value = max_speed.get('value')
-        unit = max_speed.get('unit')
-
-        if unit == 'kph':
-            return value
-        else:
-            return value * 1.60934
-        
-    return 0
-#ok well this seems like a flaw. if road speed contains one thing that is none
+    #implicit speed on road surface
+    if row['road_surface'] != None:
+        surface = row['road_surface'][0].get('value', {})
+        return Values.speeds_of_features[surface]
+    
+    return 1
 
 
 def format_into_road_table(table):
@@ -63,7 +56,7 @@ def format_into_road_table(table):
 
     #need to write pixel as seperate columns for max efficiency!!!!!!!!!!
 
-    mega_table = table[['geometry','speed_kph']].explode('geometry')
+    mega_table = table[['pixel','speed_kph']].explode('pixel')
     return(mega_table)
 
 
