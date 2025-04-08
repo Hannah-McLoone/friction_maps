@@ -91,7 +91,7 @@ class Land_values:
         "wetland": 4,           # Slow, difficult to traverse
 
 
-        #land cover subclass
+        #land cover subclass - what my code has been using so far
         "barren": 12,           # Fast speed, generally open terrain
         "crop": 14,             # Fast speed, open agricultural fields
         "forest": 5,            # Slow due to dense vegetation

@@ -1,16 +1,17 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import h5py
+import numpy as np
 
 # goes down and right (east and south) from point x,y
 y = 60
-x = -10
+x = -5
 
 
 start_row =  int((90-y) / 0.008333333333333333333 )
-end_row = start_row + 500
+end_row = start_row + 1200
 start_col =  int((180+x) / 0.008333333333333333333 )
-end_col = start_col + 500
+end_col = start_col + 600
 
 
 # Open the existing HDF5 file in read mode
@@ -20,6 +21,7 @@ with h5py.File('road_fricion_map.h5', 'r') as hdf5_file:
     
     # Sample the square section
     sampled_section = data_var[start_row:end_row, start_col:end_col]
+    sampled_section = np.minimum(sampled_section, 113)
 
 
 

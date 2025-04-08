@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 
-h5_file = "road_fricion_map_question_mark.h5"
+h5_file = "road_fricion_map.h5"
 
 # Sampling intervals
 row_stride = 11  # Adjust based on desired downsampling

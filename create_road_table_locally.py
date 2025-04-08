@@ -30,3 +30,39 @@ def create_tables_for_all_files_using_connection(remote_directory,coord_file): #
         mega_table = format_into_road_table(table)
         mega_table.to_parquet(f'higher_granularity_output/pixel_to_road_speed{n}.parquet', index=False)
         n = n+1
+
+
+
+
+
+#___________________________________________________________
+#for investigation purposes
+
+
+
+client = create_connection()
+sftp = client.open_sftp()
+remote_directory = '/maps/sj514/overture/theme=transportation/type=segment'
+file_name='part-00000-d84517a6-f7b3-48eb-8ec2-e27684978d01-c000.zstd.parquet' #35 for uk or 01
+file_path = remote_directory + '/' + file_name
+remote_file = sftp.file(file_path, 'rb')
+
+with remote_file as f:
+    batch = next(pq.ParquetFile(f).iter_batches(
+        batch_size=1000,
+        columns=['geometry','class']
+    ))
+    df = batch.to_pandas()
+    df = df[
+        df['class'].isin(['unclassified'])
+    ]
+
+def get_coord(entry):
+    return list(entry.coords)[0]
+
+from shapely import wkb
+
+client.close()
+df['geometry'] = df['geometry'].map(wkb.loads)
+df['geometry'] = df['geometry'].apply(get_coord)
+print(df)
