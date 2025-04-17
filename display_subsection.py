@@ -11,20 +11,20 @@ x = -5
 start_row =  int((90-y) / 0.008333333333333333333 )
 end_row = start_row + 1200
 start_col =  int((180+x) / 0.008333333333333333333 )
-end_col = start_col + 600
+end_col = start_col + 800
 
 
 # Open the existing HDF5 file in read mode
-with h5py.File('road_fricion_map.h5', 'r') as hdf5_file:
+with h5py.File('land_friction_map.h5', 'r') as hdf5_file:
     # Access the data variable
     data_var = hdf5_file['data']
     
     # Sample the square section
     sampled_section = data_var[start_row:end_row, start_col:end_col]
-    sampled_section = np.minimum(sampled_section, 113)
+    #sampled_section = np.minimum(sampled_section, 113)
 
 
-
+np.save('uk_land.npy', sampled_section)
 
 rows, cols = sampled_section.shape
 

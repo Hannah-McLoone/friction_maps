@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 import io
 import time
-from values import Values, water_values#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+from values import Values#, water_values#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 import sys
 ANGLE = 0.008333333333333333333
 
@@ -35,7 +35,7 @@ def extract_speed(row):
         return Values.country_road_values[row['class']]
     
     if row['subtype'] != None and row['subtype'] != 'road':
-        t = {'rail':Values.railspeed,'water':Values.waterspeed}
+        t = {'rail':Values.railspeed}
         return t[row['subtype']]
     
 

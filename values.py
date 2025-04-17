@@ -11,8 +11,9 @@ class Values:
         'unknown': None,  
         'secondary': 80,  # 50 mph → 80 kph
         'tertiary': 64,   # 40 mph → 64 kph
-        'service': 32     # 20 mph → 32 kph
-    }# need to add track, unknown
+        'service': 32,     # 20 mph → 32 kph
+        'track': 32 # added this one since latest iteration. was not run with it to produce current code
+    }
 
 
     speeds_of_features = {
@@ -27,8 +28,8 @@ class Values:
     }
 
 
-    railspeed = 60
-    waterspeed = 20 #this is for water as a transport
+    #railspeed = 60
+    #waterspeed = 20 #this is for water as a transport
 
 
 
@@ -107,32 +108,15 @@ class Land_values:
 
 
 
-
-class water_values:
-
-    water = {
-        'canal':1,
-        'human_made':1,
-        'lake':1,
-        'ocean':1,
-        'physical':1,
-        'pond':1,
-        'reservoir':1,
-        'river':1,
-        'water':1
-    }
-
-    raw_water_speed = 19
-
-ANGLE = 1#0.008333333333333333333
+ANGLE = 0.008333333333333333333
 
 
-
-#forest - 2
+#chnages i will make to next iteration
+#forest - 2, same for wood 
 #fell - 2
 #glacier - 0
 #cliff - 0
 #mountain range - 1
 #peak - 0
 #beach =/= sand
-# grass could be high - 30? moss?
+# grass could be high - 30? moss too?

@@ -50,11 +50,11 @@ remote_file = sftp.file(file_path, 'rb')
 with remote_file as f:
     batch = next(pq.ParquetFile(f).iter_batches(
         batch_size=1000,
-        columns=['geometry','class']
+        columns=['geometry','class', 'road_surface']
     ))
     df = batch.to_pandas()
     df = df[
-        df['class'].isin(['unclassified'])
+        df['class'].isin(['track'])
     ]
 
 def get_coord(entry):
