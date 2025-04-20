@@ -77,8 +77,8 @@ def land_speed(subtype):#,given_class):
 
 
 def format_into_land_table(table):
-    table['subtype'] = table['subtype'].map(land_speed)
-    table.rename(columns={'subtype': 'speed'}, inplace=True)
+    #table['subtype'] = table['subtype'].map(land_speed)
+    #table.rename(columns={'subtype': 'speed'}, inplace=True)
 
     #this line is about 5 percent of time
     table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(load_geometry_from_wkb_bytes), geometry='geometry', crs="EPSG:4326")
@@ -93,7 +93,7 @@ def format_into_land_table(table):
     return table
 
 
-def parquet_file_to_database(input_file, output_file, chunk_size=100): # more ram efficient to be readig and processing in chunks
+def parquet_file_to_database(input_file, output_file, chunk_size=100): # more ram efficient to be reading and processing in chunks
     reader = pq.ParquetFile(input_file)
     
     first_chunk = True

@@ -4,7 +4,7 @@
 
 class Values:
 
-    country_road_values = {
+    country_road_values_old = {
         'motorway': 113,  # 70 mph → 113 kph
         'primary': 97,    # 60 mph → 97 kph
         'unclassified': None, 
@@ -16,9 +16,46 @@ class Values:
     }
 
 
+    country_road_values_glob_avg = {
+        "motorway": 105,
+        "trunk": 80,
+        "railroad": 30,
+        "primary": 65,
+        "secondary": 60,
+        "tertiary": 55,
+        "unclassified": 55,
+        "road": 30,
+        "residential": 40,
+        "service": 30,
+        "track": 40,
+        "pedestrian": 25,
+        "unknown": 40
+    }
+
+
+
+
+    country_road_values = {
+        "motorway": 112.6538,
+        "trunk": 64.3736,
+        "primary": 48.2802,
+        "secondary": 48.2802,
+        "tertiary": 48.2802,
+        "motorway_link": 112.6538,
+        "primary_link": 48.2802,
+        "unclassified": 48.2802,
+        "road": 32.1868,
+        "residential": 48.2802,
+        "service": 32.1868,
+        "track": 48.2802,
+        "pedestrian": 32.1868,
+        "unknown": 48.2802
+    }
+
+
     speeds_of_features = {
-        'paved': 48,           # 30 mph → 48 kph
-        'asphalt': 50,         # 50 mph → 80 kph
+        'paved': 40,           # 30 mph → 48 kph
+        'asphalt': 40,         # 50 mph → 80 kph
         'unpaved': 24,         # 25 mph → 40 kph
         'gravel': 24,          # 20 mph → 32 kph
         'dirt': 24,            # 15 mph → 24 kph
@@ -28,7 +65,7 @@ class Values:
     }
 
 
-    #railspeed = 60
+    railspeed = 30
     #waterspeed = 20 #this is for water as a transport
 
 

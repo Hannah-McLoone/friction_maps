@@ -11,13 +11,8 @@ reformat my arrays rows and columns?
 """
 
 def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename):
-    resolution = 1 # how many km in square
+    resolution = 1 # how many km in square #########change back to 1
     angle = 0.008333333333333333333 / resolution
-
-    #x_n = 360 / angle # 500
-    #y_n = 500
-    #xangle = -180
-    #yangle = 51
     duckdb.query("PRAGMA threads=8") 
 
 
@@ -44,7 +39,7 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename):
     SELECT input_geometries.geometry, COALESCE(MAX(read_parquet.speed_kph), 0) AS max_speed
     FROM input_geometries
     LEFT JOIN read_parquet('{filename}*.parquet') AS read_parquet
-    ON input_geometries.geometry = read_parquet.geometry
+    ON input_geometries.geometry = read_parquet.pixel
     GROUP BY input_geometries.geometry, input_geometries.original_index
     ORDER BY input_geometries.original_index
     """
@@ -64,30 +59,38 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    resolution = 1 # how many km in square
+    resolution = 1 # how many km in square#########################change
     angle = 0.008333333333333333333 / resolution
 
+    y_angle = 58 - 500 * angle #delete the change 58 to 90!!!!!!!!!!!!!!!!!!
+    y2_angle = y_angle - 500 * angle
+    print(y2_angle)
 
-    y_angle = 90 - 500 * 0.008333333333333333333
-    y2_angle = y_angle - 500 * 0.008333333333333333333
-
-    rows = int(180 / 0.008333333333333333333)
-    cols = int(360 / 0.008333333333333333333)
+    rows = int(180 / angle)
+    cols = int(360 / angle)
 
     # Create HDF5 file
-    with h5py.File('my_data2.h5', 'w') as hdf5_file:
+    with h5py.File('uk_roads.h5', 'w') as hdf5_file:
         # Create datasets with specified dimensions and chunking
         var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
-        while y2_angle > -90:
+        while y2_angle > 49:#meant to be -90!!!!!!!!!!!!!!!!!!!!
             print(y2_angle)
-            result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'output/pixel_to_road_speed')  # Assuming this function is defined elsewhere
+            #result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'output2/increased_resolution_pixel_to_road_speed')  # Assuming this function is defined elsewhere
+            result_array = create_friction_map_for_section(8 / angle,500, -6, y_angle,'output/pixel_to_road_speed')  # Assuming this function is defined elsewhere
             result_rows, cols = result_array.shape
             y_angle = y2_angle
-            y2_angle = y2_angle - 500 * 0.008333333333333333333
+            y2_angle = y2_angle - 500 * angle
 
             # Append result_array to the dataset
             var.resize((var.shape[0] + result_rows, cols))  # Resize the dataset to accommodate new data
             var[-result_rows:, :] = result_array  # Append without full read
 
     print(time.time() - start_time)
+
+
+
+
+
+#58 to 50n
+#6 west to 2 east

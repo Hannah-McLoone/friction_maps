@@ -9,7 +9,7 @@ import io
 import time
 from values import Values#, water_values#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 import sys
-ANGLE = 0.008333333333333333333
+ANGLE = 0.008333333333333333333 / 5 # 30/3600
 
 def grid_loc(entry):#how many pixels it is from 0,0
     point_set = list(entry.coords)
@@ -17,7 +17,12 @@ def grid_loc(entry):#how many pixels it is from 0,0
 
 
 def extract_speed(row):
-    if row['speed_limits'] != None:  # Check if there is a speed limit
+    if row['subtype'] == 'rail':
+        return Values.railspeed
+    return Values.country_road_values[row['class']] # delete!!!!!!!!!!
+    speed_lim = -1
+
+    if row['speed_limits'] is not None:  # Check if there is a speed limit
         max_speed = row['speed_limits'][0].get('max_speed', {})  # Safely get 'max_speed' dictionary
 
         if max_speed != None and max_speed != {}:
@@ -25,26 +30,33 @@ def extract_speed(row):
             unit = max_speed.get('unit')
 
             if unit == 'kph':
-                return value
+                speed_lim = value
             else:
-                return value * 1.60934
+                speed_lim = value * 1.60934
 
+
+
+
+    #limit by speed limit
 
     # implicit speed - on types of road
-    if row['class'] != None and row['class'] != 'unclassified' and row['class'] != 'unknown':
+    if row['class'] is not None and row['class'] != 'unknown' and row['class'] != 'track':
+
+        if speed_lim != -1:
+            return min(speed_lim, Values.country_road_values[row['class']])
         return Values.country_road_values[row['class']]
     
-    if row['subtype'] != None and row['subtype'] != 'road':
-        t = {'rail':Values.railspeed}
-        return t[row['subtype']]
-    
-
+    #anything else is extension from weisse
     #implicit speed on road surface
-    if row['road_surface'] != None:
+    if row['road_surface'] is not None:
         surface = row['road_surface'][0].get('value', {})
+
+        if speed_lim != -1:
+            return min(speed_lim, Values.speeds_of_features[surface])
         return Values.speeds_of_features[surface]
     
-    return 1
+    
+    return 0
 
 
 def format_into_road_table(table):
