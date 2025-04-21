@@ -71,14 +71,14 @@ if __name__ == "__main__":
     cols = int(360 / angle)
 
     # Create HDF5 file
-    with h5py.File('uk2_roads_other.h5', 'w') as hdf5_file:
+    with h5py.File('final_roads.h5', 'w') as hdf5_file:
         # Create datasets with specified dimensions and chunking
         var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
         while y2_angle > 49:#meant to be -90!!!!!!!!!!!!!!!!!!!!
             print(y2_angle)
             #result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'output2/increased_resolution_pixel_to_road_speed')  # Assuming this function is defined elsewhere
-            result_array = create_friction_map_for_section(8 / angle, 500, -6, y_angle,'output3/please') 
+            result_array = create_friction_map_for_section(8 / angle, 500, -6, y_angle,'output/pixel_to_road_speed') 
             #print(result_array)
             result_rows, cols = result_array.shape
             y_angle = y2_angle

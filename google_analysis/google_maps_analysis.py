@@ -1,21 +1,3 @@
-# DO NOT LEAVE API KEY IN
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-#this road must have fewer than the other.
-
-"""
-theres 3 sources of data
-
-uk_roads[??]:
-uing weisses global values
-
-uk_roads_other: [?????]
-using weises values for uk values
-
-uk2_roads_other:
-using speed limits. if data isnt available, increased speed limit - forced to fit.
-
-"""
 import requests
 import random
 import h5py
@@ -23,11 +5,8 @@ import heapq
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-
-
 from dotenv import load_dotenv
 import os
-
 load_dotenv()
 api_key = os.getenv("API_KEY")
 

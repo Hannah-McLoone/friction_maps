@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 import io
 import time
-from values import Values#, water_values#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+from values import Values
 import sys
 ANGLE = 0.008333333333333333333 # 30/3600
 
@@ -32,29 +32,26 @@ def extract_speed(row):
                 speed_lim = value
             else:
                 speed_lim = value * 1.60934
-            
-            return speed_lim#kill this
-
-
-
 
     #limit by speed limit
 
     # implicit speed - on types of road
-    if row['class'] is not None:# and row['class'] != 'unknown' and row['class'] != 'track':
+    if row['class'] is not None:
 
-        if False and speed_lim != -1:
+        if speed_lim != -1:
             return min(speed_lim, Values.country_road_values[row['class']])
         return Values.country_road_values[row['class']]
     
     #anything else is extension from weisse
-    #implicit speed on road surface
+    #such as implicit speed on road surface. most likely used for track or unknown
+    """
     if row['road_surface'] is not None:
         surface = row['road_surface'][0].get('value', {})
 
         if speed_lim != -1:
             return min(speed_lim, Values.speeds_of_features[surface])
         return Values.speeds_of_features[surface]
+    """
     
     
     return 0

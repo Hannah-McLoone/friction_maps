@@ -1,22 +1,26 @@
-import h5py
 import numpy as np
+import rasterio
 import matplotlib.pyplot as plt
 
-h5_file = "uk2_roads_other.h5"
+# Path to the GeoTIFF file
+tiff_file = "friction_map.tif"
+
 # Sampling intervals
 row_stride = 11  # Adjust based on desired downsampling
-col_stride = 11 # Adjust based on desired downsampling
+col_stride = 11  # Adjust based on desired downsampling
 
-with h5py.File(h5_file, "r") as f:
-    # Automatically retrieve the first dataset
-    dataset = next(iter(f.values()))
-    
+# Open the GeoTIFF file
+with rasterio.open(tiff_file) as src:
+    # Read the first band
+    data = src.read(1)
+
     # Display the original shape of the dataset
-    print(f"Original dataset shape: {dataset.shape}")
-    
-    # Downsample by selecting every 'row_stride'th row and 'col_stride'th column
-    downsampled_data = dataset[::row_stride, ::col_stride]
+    print(f"Original dataset shape: {data.shape}")
 
+    # Downsample by selecting every 'row_stride'th row and 'col_stride'th column
+    downsampled_data = data[::row_stride, ::col_stride]
+
+    # Clip values to a maximum of 100 (if desired)
     downsampled_data = np.minimum(downsampled_data, 100)
 
 # Plot the downsampled data as a heatmap

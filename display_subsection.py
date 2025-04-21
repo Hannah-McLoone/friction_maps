@@ -1,11 +1,16 @@
+#change to use geotiff instead of h5
+
 import matplotlib.pyplot as plt
 import seaborn as sns
-import h5py
-import numpy as np
+import rasterio
+import matplotlib.pyplot as plt
 
+
+tiff_file = "friction_map.tif"
 # goes down and right (east and south) from point x,y
 y = 60
 x = -5
+
 
 
 start_row =  int((90-y) / 0.008333333333333333333 )
@@ -15,12 +20,13 @@ end_col = start_col + 800
 
 
 # Open the existing HDF5 file in read mode
-with h5py.File('uk2_roads_other.h5', 'r') as hdf5_file:
-    # Access the data variable
-    data_var = hdf5_file['data']
-    
+
+with rasterio.open(tiff_file) as src:
+    # Read the full first band
+    data = src.read(1)
+
     # Sample the square section
-    sampled_section = data_var[start_row:end_row, start_col:end_col]
+    sampled_section = data[start_row:end_row, start_col:end_col]
     #sampled_section = np.minimum(sampled_section, 113)
 
 

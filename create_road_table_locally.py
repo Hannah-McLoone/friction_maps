@@ -31,6 +31,8 @@ def create_tables_for_all_files_using_connection(remote_directory,coord_file): #
         mega_table.to_parquet(f'output/pixel_to_road_speed{n}.parquet', index=False)
         n = n+1
 
+
+#might want to get rid of the previous one. this is coping with the fact that the socket closes sometimes
 def create_tables_for_all_files_using_connection(remote_directory,coord_file): #coord file contains list of names
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
@@ -58,7 +60,7 @@ def create_tables_for_all_files_using_connection(remote_directory,coord_file): #
                 table = table.to_pandas()
 
             mega_table = format_into_road_table(table)
-            mega_table.to_parquet(f'output3/please{n}.parquet', index=False)
+            mega_table.to_parquet(f'output/pixel_to_road_speed{n}.parquet', index=False)
             n = n+1
         except Exception as e:
             print(f"Error processing {file_name}: {e}")

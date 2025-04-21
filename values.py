@@ -1,21 +1,8 @@
-
-# these are temporary paceholder values. there are more roads to be put in
 # ASSUMES ALL VALUES IN KM PER HOUR!
 
 class Values:
 
-    country_road_values_old = {
-        'motorway': 113,  # 70 mph → 113 kph
-        'primary': 97,    # 60 mph → 97 kph
-        'unclassified': None, 
-        'unknown': None,  
-        'secondary': 80,  # 50 mph → 80 kph
-        'tertiary': 64,   # 40 mph → 64 kph
-        'service': 32,     # 20 mph → 32 kph
-        'track': 32 # added this one since latest iteration. was not run with it to produce current code
-    }
-
-
+    #what weisse uses as his global averages
     country_road_values_glob_avg = {
         "motorway": 105,
         "trunk": 80,
@@ -32,9 +19,7 @@ class Values:
         "unknown": 40
     }
 
-
-
-
+    #what weisse uses as his uk specific values
     uk_country_road_values = {
         "motorway": 112.6538,
         "trunk": 64.3736,
@@ -43,21 +28,6 @@ class Values:
         "tertiary": 48.2802,
         "motorway_link": 112.6538,
         "primary_link": 48.2802,
-        "unclassified": 48.2802,
-        "road": 32.1868,
-        "residential": 48.2802,
-        "service": 32.1868,
-        "track": 48.2802,
-        "pedestrian": 32.1868,
-        "unknown": 48.2802
-    }
-
-    country_road_values = {
-        "motorway": 112.6538,
-        "trunk": 64.3736,
-        "primary": 97,
-        "secondary": 80,
-        "tertiary": 64,
         "unclassified": 48.2802,
         "road": 32.1868,
         "residential": 48.2802,
@@ -161,14 +131,3 @@ class Land_values:
 
 
 ANGLE = 0.008333333333333333333
-
-
-#chnages i will make to next iteration
-#forest - 2, same for wood 
-#fell - 2
-#glacier - 0
-#cliff - 0
-#mountain range - 1
-#peak - 0
-#beach =/= sand
-# grass could be high - 30? moss too?
