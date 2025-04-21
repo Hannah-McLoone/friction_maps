@@ -34,7 +34,9 @@ def create_tables_for_all_files_using_connection(remote_directory,coord_file): #
 def create_tables_for_all_files_using_connection(remote_directory,coord_file): #coord file contains list of names
     df = pd.read_csv(coord_file)
     names_list = df['file_name'].tolist()
-    names_list = [names_list[16],names_list[17],names_list[33],names_list[35],names_list[39]]
+    #names_list = [names_list[16],names_list[17],names_list[33],names_list[35],names_list[39]]
+    names_list = [names_list[16],names_list[17],names_list[18],names_list[33],names_list[35]]
+
 
     n = 0
     # Loop through each file in the names_list
@@ -56,7 +58,7 @@ def create_tables_for_all_files_using_connection(remote_directory,coord_file): #
                 table = table.to_pandas()
 
             mega_table = format_into_road_table(table)
-            mega_table.to_parquet(f'output3/just_uk_slightly_adjusted{n}.parquet', index=False)
+            mega_table.to_parquet(f'output3/please{n}.parquet', index=False)
             n = n+1
         except Exception as e:
             print(f"Error processing {file_name}: {e}")

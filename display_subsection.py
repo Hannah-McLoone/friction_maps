@@ -15,7 +15,7 @@ end_col = start_col + 800
 
 
 # Open the existing HDF5 file in read mode
-with h5py.File('land_friction_map.h5', 'r') as hdf5_file:
+with h5py.File('uk2_roads_other.h5', 'r') as hdf5_file:
     # Access the data variable
     data_var = hdf5_file['data']
     
@@ -23,8 +23,6 @@ with h5py.File('land_friction_map.h5', 'r') as hdf5_file:
     sampled_section = data_var[start_row:end_row, start_col:end_col]
     #sampled_section = np.minimum(sampled_section, 113)
 
-
-np.save('uk_land.npy', sampled_section)
 
 rows, cols = sampled_section.shape
 

@@ -1,22 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
 
-cost_map = np.load('cost_map2.npy')
-#cost_map = cost_map[1050:2600,900:4000]
+# Replace with the path to your Parquet file
+file_path = 'output3/just_uk_my_own_values_to_force_it_to_look_good4.parquet'
 
-cost_map = cost_map[::10, ::10]
-cost_map = np.minimum(cost_map, 1000)
+# Load the Parquet file
+df = pd.read_parquet(file_path)
 
-from matplotlib.colors import LogNorm
-#plt.imshow(cost_map, norm=LogNorm(vmin=0.1, vmax=1000), cmap='viridis_r')  # Adjust vmin/vmax as needed
+# Print the first few rows
+print(df.head())
 
-from matplotlib.colors import PowerNorm
-
-plt.imshow(cost_map, norm=PowerNorm(gamma=0.2), cmap='viridis_r')
-
-
-#--------display-------------
-#sns.heatmap(cost_map, cmap="viridis_r", annot=False, cbar=False)
-plt.title("Heatmap of Sampled Data")
-plt.show()
+#is this in it
+'[210, 6959]'

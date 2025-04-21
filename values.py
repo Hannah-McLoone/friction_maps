@@ -35,7 +35,7 @@ class Values:
 
 
 
-    country_road_values = {
+    uk_country_road_values = {
         "motorway": 112.6538,
         "trunk": 64.3736,
         "primary": 48.2802,
@@ -43,6 +43,21 @@ class Values:
         "tertiary": 48.2802,
         "motorway_link": 112.6538,
         "primary_link": 48.2802,
+        "unclassified": 48.2802,
+        "road": 32.1868,
+        "residential": 48.2802,
+        "service": 32.1868,
+        "track": 48.2802,
+        "pedestrian": 32.1868,
+        "unknown": 48.2802
+    }
+
+    country_road_values = {
+        "motorway": 112.6538,
+        "trunk": 64.3736,
+        "primary": 97,
+        "secondary": 80,
+        "tertiary": 64,
         "unclassified": 48.2802,
         "road": 32.1868,
         "residential": 48.2802,
