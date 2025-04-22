@@ -2,7 +2,6 @@ import rasterio
 from rasterio import Affine
 from rasterio.enums import Resampling
 import numpy as np
-import math
 
 def toblers_walking_speed(slope):
     slope_rad = np.radians(slope)
@@ -10,19 +9,29 @@ def toblers_walking_speed(slope):
     return 6 * np.exp(-3.5 * adjusted_slope)
 
 def elevation_adjustment(elevation):
-    return 1.016 * np.exp(-3.5 * adjusted_slope)
+    return 1.016 * np.exp(-0.0001072 * elevation)
 
 
-input_path = 'slope_1KMmd_SRTM.tif'
 
-with rasterio.open(input_path) as src:
+
+slope_file = 'slope_1KMmd_SRTM.tif'
+elevation_file = 'slope_1KMmd_SRTM.tif'
+
+with rasterio.open(slope_file) as src:
     profile = src.profile
-    data = src.read(1)  # there is only one band
+    slope_data = src.read(1)  # there is only one band
 
+with rasterio.open(elevation_file) as src:
+    profile = src.profile
+    elevation_data = src.read(1)  # there is only one band
 
 # Apply the function to the slope data
-walking_speed = toblers_walking_speed(data)
+walking_speed = toblers_walking_speed(slope_data)
 slope_adjustment_factor = walking_speed/5
+
+elevation_factor = elevation_adjustment(elevation_data)
+
+
 
 
 
