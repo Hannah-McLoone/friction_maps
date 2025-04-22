@@ -6,6 +6,11 @@ import h5py
 
 
 """
+really this was just being used by google comparison to only bother making the friction map for a small area. 
+not useful in practicalities. can bin
+
+
+
 need to rotate this 90 degrees anticlockwise!!!!!!!
 reformat my arrays rows and columns?
 """
