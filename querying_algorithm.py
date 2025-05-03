@@ -68,7 +68,6 @@ if __name__ == "__main__":
 
 
     y_angle = 90 - 500 * 0.008333333333333333333
-    y2_angle = y_angle - 500 * 0.008333333333333333333
 
     rows = int(180 / 0.008333333333333333333)
     cols = int(360 / 0.008333333333333333333)
@@ -77,19 +76,25 @@ if __name__ == "__main__":
     selection2 = "SELECT input_pixels.pixel, COALESCE(MAX(read_parquet.speed_kph), 0) AS speed"
 
     # Create HDF5 file
-    with h5py.File('temp.h5', 'w') as hdf5_file:
+    with h5py.File('road_friction_map.h5', 'w') as hdf5_file:
         # Create datasets with specified dimensions and chunking
         var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
-        while y2_angle > -90:
-            print(y2_angle)
-            result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'/maps/hm708/processed_land', selection1)  # Assuming this function is defined elsewhere
+        while y_angle > -90:
+            print(y_angle)
+            result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'output/pixel_to_road_speed', selection1) # /maps/hm708/processed_land
             result_rows, cols = result_array.shape
-            y_angle = y2_angle
-            y2_angle = y2_angle - 500 * 0.008333333333333333333
 
             # Append result_array to the dataset
             var.resize((var.shape[0] + result_rows, cols))  # Resize the dataset to accommodate new data
             var[-result_rows:, :] = result_array  # Append without full read
+
+            y_angle = y_angle  - 500 * 0.008333333333333333333
+
+        remainder = (500 - (-90-y_angle)//angle )
+        result_array = create_friction_map_for_section(360 / angle,remainder, -180, -90,'output/pixel_to_road_speed', selection1)
+        result_rows, cols = result_array.shape
+        var.resize((var.shape[0] + result_rows, cols))
+        var[-result_rows:, :] = result_array 
 
     print(time.time() - start_time)

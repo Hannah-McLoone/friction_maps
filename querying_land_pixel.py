@@ -70,7 +70,6 @@ if __name__ == "__main__":
 
 
     y_angle = 90 - 500 * 0.008333333333333333333
-    y2_angle = y_angle - 500 * 0.008333333333333333333
 
     rows = int(180 / 0.008333333333333333333)
     cols = int(360 / 0.008333333333333333333)
@@ -80,12 +79,11 @@ if __name__ == "__main__":
         # Create datasets with specified dimensions and chunking
         var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
-        while y2_angle > -90:
-            print(y2_angle)
+        while y_angle > -90:
+            print(y_angle)
             result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle,'/maps/hm708/processed_land')  # Assuming this function is defined elsewhere
             result_rows, cols = result_array.shape
-            y_angle = y2_angle
-            y2_angle = y2_angle - 500 * 0.008333333333333333333
+            y_angle = y_angle  - 500 * 0.008333333333333333333
 
             # Append result_array to the dataset
             var.resize((var.shape[0] + result_rows, cols))  # Resize the dataset to accommodate new data

@@ -5,7 +5,7 @@ from rasterio.transform import from_origin
 from rasterio.crs import CRS
 
 # Load the 2D array from the HDF5 file
-with h5py.File("road_fricion_map.h5", "r") as f:
+with h5py.File("road_friction_map.h5", "r") as f:
     # Assuming the only dataset is the array
     dataset_name = list(f.keys())[0]
     data = f[dataset_name][()]
@@ -25,7 +25,7 @@ crs = CRS.from_epsg(4326)
 
 # Write the GeoTIFF
 with rasterio.open(
-    "friction_map.tif",
+    "road_friction_map.tif",
     "w",
     driver="GTiff",
     height=data.shape[0],
