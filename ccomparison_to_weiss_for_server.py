@@ -1,4 +1,3 @@
-# push weisses
 import numpy as np
 from scipy.optimize import least_squares
 import duckdb
@@ -9,10 +8,7 @@ import pandas as pd
 
 """
 extension:
-split into training and testing
-add scaling by elevation and slope
 choose specific sub areas
-use roads as mask
 """
 
 
@@ -37,12 +33,15 @@ def create_table(coords):
 
     result = duckdb.query(query).df()
     pivot_df = result.pivot(index='pixel', columns='subtype', values='total_coverage').fillna(0)
-    for col in ["barren", "crop", "forest", "grass", "mangrove", "moss", "shrub", "snow", "urban", "wetland"]:
+    for col in ["barren", "crop", "forest", "grass", "mangrove", "moss", "shrub", "snow", "urban", "wetland","desert","glacier", "physical", "reef", "rock","sand","tree"]:
         if col not in pivot_df.columns:
             pivot_df[col] = 0
     
     pivot_df.fillna(0, inplace=True)
     pivot_df = pivot_df.loc[cord_list].reset_index()
+
+    if 'land' in pivot_df['pixel'].values:
+        pivot_df = pivot_df[pivot_df['pixel'] != 'land']
 
     return(pivot_df)
 
@@ -50,7 +49,7 @@ def create_table(coords):
 def toblers_walking_speed(slope):
     slope_rad = np.radians(slope)
     adjusted_slope = np.abs(np.tan(slope_rad) + 0.05)
-    return 6 * np.exp(-3.5 * adjusted_slope)
+    return min(5,6 * np.exp(-3.5 * adjusted_slope))
 
 def elevation_adjustment(elevation):
     return 1.016 * np.exp(-0.0001072 * elevation)
@@ -66,29 +65,31 @@ def get_weiss_value(coords): # these are float coords
         index = src.index
         for x, y in coords:
             col, row = index(x * resolution, y * resolution)
-            values.append(band1[row, col])
-    
-    with rasterio.open('slope_1KMmd_SRTM.tif') as src:
+            values.append(band1[col,row])#
+
+    with rasterio.open('/maps/hm708/slope_1KMmd_SRTM.tif') as src:
         band1 = src.read(1)  # Read once instead of in the loop
         index = src.index
-        for i in range in range (0, len(coords)):
+        for i in range(0, len(coords)):
             x,y = coords[i]
             col, row = index(x * resolution, y * resolution)
-            slope_scaling = toblers_walking_speed(band1[row, col]) / 5
+            slope_scaling = toblers_walking_speed(band1[col, row]) / 5
             values[i] = values[i] / slope_scaling
 
-    with rasterio.open('elevation_1KMmd_SRTM.tif') as src:
+    with rasterio.open('/maps/hm708/elevation_1KMmd_SRTM.tif') as src:
         band1 = src.read(1)  # Read once instead of in the loop
         index = src.index
-        for i in range in range (0, len(coords)):
+        for i in range(0, len(coords)):
             x,y = coords[i]
             col, row = index(x * resolution, y * resolution)
-            elevation_scaling = elevation_adjustment(band1[row, col])
+            elevation_scaling = elevation_adjustment(band1[col,row])
             values[i] = values[i] / elevation_scaling
+    print('finished creating weiss values')
+    return values
 
-def calculate_speed(coords, params):
+
+def calculate_speed(table, params):
     #sum of speed * coverage / sum of coverage
-    print('-')
     landtype_to_speed = {
         "barren":params[0],
         "crop": params[1],
@@ -99,9 +100,17 @@ def calculate_speed(coords, params):
         "shrub": params[6],
         "snow": params[7],
         "urban": params[8],
-        "wetland": params[9]   
-    }
+        "wetland": params[9],   
 
+
+        "desert": params[10],
+        "glacier": params[11],
+        "physical": params[12],
+        "reef": params[13],
+        "rock": params[14],
+        "sand": params[15],
+        "tree": params[16]
+    }
     speed_series = pd.Series(landtype_to_speed)
 
     # Select only land type columns
@@ -115,32 +124,49 @@ def calculate_speed(coords, params):
     
 
 
-#pick coords between 85 and -60
-resolution = 0.008333333333333333333
+from sklearn.model_selection import train_test_split
+
+resolution = 0.008333333333333333
 coordinates = []
-for _ in range(3):
-    x = random.randint(-180, 180)
-    y = random.randint(-60, 85)# y should go from -60 to 85
-    coordinates.append((x//resolution, y//resolution))
 
+# Generate 100,000 random coordinates
+for _ in range(100000):
+    x = random.uniform(-179.9, 179.9)
+    y = random.uniform(-59.9, 84.9)
+    coordinates.append((x // resolution, y // resolution))
 
-#create table no longer in same order as coordinates
-
+# Get the corresponding truth values
 truth = get_weiss_value(coordinates)
 
+# Split into train and test sets
+coords_train, coords_test, truth_train, truth_test = train_test_split(
+    coordinates, truth, test_size=0.2, random_state=42
+)
+
+# Define residuals function using training data
 def residuals(params):
-    sample = np.array(calculate_speed(coordinates, params))
-    return sample - truth
+    sample = np.array(calculate_speed(table_train, params))
+    return sample - truth_train
+
+# Optimization
+initial_guess = np.ones(17)
+table_train = create_table(coords_train)
+table_test = create_table(coords_test)
 
 
-# Initial guess: 30 parameters
-initial_guess = np.ones(10)
-table = create_table(coordinates)
-print('-')
-result = least_squares(residuals, initial_guess, loss='linear', max_nfev=3)  # use 'soft_l1' for robustness???
 
+
+print('starting least squares')
+result = least_squares(residuals, initial_guess, loss='linear')
+
+# Save result
 print(result.x)
 with open('optimized_parameters.csv', 'w', newline='') as f:
     csv.writer(f).writerow(result.x)
+
+# Optionally: Evaluate on test set
+predicted_test = calculate_speed(table_test, result.x)
+error = np.array(predicted_test) - np.array(truth_test)
+print('Test RMSE:', np.sqrt(np.mean(error**2)))
 
 

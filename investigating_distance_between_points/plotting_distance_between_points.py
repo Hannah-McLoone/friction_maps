@@ -68,7 +68,7 @@ def get_y(points):
 # File path
 
 file_path = 'investigating_distance_between_points/sample_of_road_points.csv' # depending on working directory get rid of the file name
-#file_path = 'investigating_distance_between_points/amazon_sample.csv'
+file_path = 'investigating_distance_between_points/amazon_sample.csv'
 df = pd.read_csv(file_path)
 df = df[df['class'] == 'unclassified']
 print(len(df))
@@ -87,7 +87,7 @@ bins = np.linspace(0, max_value, 50)
 df['distance_km'] = df['distance_km'].apply(lambda x: min(x, max_value))
 
 
-#"""
+"""
 sns.histplot(df['distance_km'], bins=bins)
 
 #plt.yscale('log') if i want the logged version
@@ -98,13 +98,14 @@ plt.ylabel('Frequency', fontsize=14)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
 
-#"""
-
-
 """
+
+
+#"""
 #this is the code for visualising how area plays a factor
 # plots the points on global map
-
+df = df[df['x'] < -30]
+df = df[df['y'] > -60]
 from matplotlib.colors import Normalize
 #plt.figure(figsize=(15, 6))
 plt.figure(figsize=(7, 6))
@@ -121,7 +122,7 @@ plt.ylabel('Y Coordinate')
 # Show plot
 plt.show()
 
-"""
+#"""
 """
 
 import random

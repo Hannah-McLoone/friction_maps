@@ -57,48 +57,6 @@ class Values:
 
 class Land_values:
 
-    land_class_speeds = {
-        "archipelago": 15,      # Moderate speed through islands
-        "bare_rock": 5,         # Slow due to uneven surfaces
-        "beach": 10,            # Moderate speed, soft sand can slow down
-        "cave_entrance": 3,     # Slow, limited visibility and accessibility
-        "cliff": 2,             # Very slow, steep and dangerous terrain
-        "desert": 10,           # Moderate speed, but can vary with sand conditions
-        "dune": 6,              # Slow due to soft sand
-        "fell": 8,              # Moderate speed on uneven ground
-        "forest": 5,            # Slow due to obstacles and dense vegetation
-        "glacier": 4,           # Very slow, icy and hazardous
-        "grass": 12,            # Moderate speed, generally easy to traverse
-        "grassland": 15,        # Fast speed on open land
-        "heath": 10,            # Moderate speed, some obstacles
-        "hill": 8,              # Moderate speed, can vary with steepness
-        "island": 12,           # Similar to grassland
-        "islet": 12,            # Similar to grassland
-        "land": 15,             # General flat land speed
-        "meadow": 14,           # Fast speed, open and easy to navigate
-        "mountain_range": 3,    # Very slow, rugged terrain
-        "peak": 2,              # Extremely slow, steep and challenging
-        "peninsula": 15,        # Similar to grassland, depends on terrain
-        "reef": 8,              # Moderate speed, can be tricky
-        "ridge": 5,             # Slow, uneven surfaces
-        "rock": 3,              # Very slow, difficult to navigate
-        "saddle": 6,            # Moderate speed, can be easier
-        "sand": 5,              # Slow, loose terrain
-        "scree": 4,             # Slow, loose rock can be tricky
-        "scrub": 10,            # Moderate speed, some obstacles
-        "shingle": 7,           # Moderate speed, pebbly terrain
-        "shrub": 10,            # Moderate speed, can have some obstacles
-        "shrubbery": 8,         # Moderate speed, denser than scrub
-        "stone": 3,             # Very slow, difficult surfaces
-        "tree": 5,              # Slow due to obstacles
-        "tree_row": 6,          # Moderate speed, some spacing
-        "tundra": 10,           # Moderate speed, but can vary with conditions
-        "valley": 12,           # Fast speed, generally easy to navigate
-        "volcano": 5,           # Slow, steep and rocky
-        "wetland": 4,           # Slow, difficult to traverse
-        "wood": 5                # Slow, similar to forest
-    }
-
     land_type_speeds = {
         "desert": 10,           # Moderate speed, varies with sand conditions
         "forest": 5,            # Slow due to dense vegetation and obstacles
@@ -111,8 +69,10 @@ class Land_values:
         "sand": 5,              # Slow due to loose terrain
         "shrub": 10,            # Moderate speed, some obstacles
         "tree": 5,              # Slow, due to obstacles
-        "wetland": 4,           # Slow, difficult to traverse
+        "wetland": 4           # Slow, difficult to traverse
+    }
 
+    land_cover_type_speeds = {
 
         #land cover subclass - what my code has been using so far
         "barren": 12,           # Fast speed, generally open terrain
