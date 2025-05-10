@@ -1,18 +1,18 @@
 INPUT_BASE="/maps/sj514/overture/theme=transportation/type=segment"
 OUTPUT_BASE="/maps/hm708/processed_roads"
 SUFFIX="-d84517a6-f7b3-48eb-8ec2-e27684978d01-c000.zstd.parquet"
-FRICTION_MAP_PATH1='/maps/hm708/road_friction_map.tiff'
+FRICTION_MAP_PATH1='/maps/hm708/road_friction_map.tif'
 
 INPUT_BASE2="/maps/sj514/overture/theme=base/type=land_cover"
 OUTPUT_BASE2="/maps/hm708/processed_land"
 SUFFIX2="-4c588cee-fa22-41da-975c-c6df5012d209-c000.zstd.parquet" 
-FRICTION_MAP_PATH2=/maps/hm708/land_friction_map.tiff
+FRICTION_MAP_PATH2=/maps/hm708/land_friction_map.tif
 
-SLOPE_FILE=/maps/hm708/processed_land
-ELEVATION_FILE=/maps/hm708/processed_land
-FRICTION_MAP_PATH3=/maps/hm708/land_friction_map_with_sclaing.tiff
+SLOPE_FILE=/maps/hm708/slope_1KMmd_SRTM.tif
+ELEVATION_FILE=/maps/hm708/elevation_1KMmd_SRTM.tif
+FRICTION_MAP_PATH3=/maps/hm708/land_friction_map_with_sclaing.tif
 
-MAX_PROCS=3
+MAX_PROCS=6
 
 
 

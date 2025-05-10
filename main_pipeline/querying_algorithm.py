@@ -8,6 +8,7 @@ import sys
 import rasterio
 from rasterio.transform import from_origin
 from rasterio.crs import CRS
+import os
 
 def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
 
@@ -106,6 +107,8 @@ if __name__ == "__main__":
             dataset_name = list(f.keys())[0]
             data = f[dataset_name][()]
 
+        os.remove('temp_h5_file.hf')
+
 
 
         # Create the geotransform
@@ -129,5 +132,9 @@ if __name__ == "__main__":
             dst.write(data, 1)
 
 
+        import csv
+        current_time = time.time()
 
-        print(time.time() - start_time)
+        with open(f'timing_log{type_of_friction_map}.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([start_time, current_time])
