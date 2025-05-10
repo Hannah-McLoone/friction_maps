@@ -5,9 +5,9 @@ import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 import io
 import time
-from main_pipeline.values import Transport_values
+from values import Transport_values
 import sys
-from main_pipeline.values import ANGLE # again, need to override this with 1
+from values import ANGLE # again, need to override this with 1
 
 def grid_loc(entry):#how many pixels it is from 0,0
     point_set = list(entry.coords)
@@ -36,11 +36,11 @@ def extract_speed(row):
     # implicit speed - on types of road
     if row['class'] is not None:
         if speed_lim != -1:
-            return min(speed_lim, Transport_values.country_road_values[row['class']])
-        return Transport_values.country_road_values[row['class']]
+            return min(speed_lim, Transport_values.country_road_values_glob_avg[row['class']])
+        return Transport_values.country_road_values_glob_avg[row['class']]
     
     #anything else is extension from weisse. as stated earlier i am trying to mimic his results
-    #but if one wanted to use other information, it is here ready to use
+    #but if one wanted to use other information, it is here
     #example of implicit speed on road surface, would need to have a mapping in the balues program
     """
     if row['road_surface'] is not None:

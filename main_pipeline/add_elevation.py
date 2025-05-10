@@ -4,6 +4,7 @@ from rasterio.enums import Resampling
 import numpy as np
 from rasterio.transform import from_origin
 from rasterio.crs import CRS
+import sys
 
 def toblers_walking_speed(slope):
     slope_rad = np.radians(slope)
@@ -73,3 +74,12 @@ def apply_scaling_to_data(my_data_path = 'land_friction_map.tif'
         transform=transform,
     ) as dst:
         dst.write(data, 1)
+
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 5:
+        print("Usage: python script <my_data_path> <slope_file> <elevation_file> <output_file>")
+    else:
+        my_data_path, slope_file, elevation_file, output_file = sys.argv[1], sys.argv[2],  sys.argv[3],  sys.argv[4]
+        apply_scaling_to_data(my_data_path, slope_file, elevation_file, output_file)

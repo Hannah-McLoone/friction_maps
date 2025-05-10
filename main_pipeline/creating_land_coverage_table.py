@@ -7,15 +7,15 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 import time
 import numpy as np
-from main_pipeline.values import Land_values
-#from values import ANGLE
+from values import Land_values
+from values import ANGLE
 import geopandas as gpd
 from shapely import wkb
 from shapely.geometry import Polygon
 import sys
 
 
-ANGLE = 1#need a way of overwriting for unit tests. get rid of this for running!!!!!!!!!!!!!!!!!!!!!
+#ANGLE = 1#need a way of overwriting for unit tests. get rid of this for running!!!!!!!!!!!!!!!!!!!!!
 
 def load_geometry_from_wkb_bytes(wkb_bytes):
     binary_wkb = wkb_bytes.hex()
@@ -114,7 +114,7 @@ def parquet_file_to_database(input_file, output_file, chunk_size=100): # more ra
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python script <arg1> <arg2>")
+        print("Usage: python script <input_file> <output_file>")
     else:
-        arg1, arg2 = sys.argv[1], sys.argv[2]
-        parquet_file_to_database(arg1, arg2)
+        input_file, output_file = sys.argv[1], sys.argv[2]
+        parquet_file_to_database(input_file, output_file)

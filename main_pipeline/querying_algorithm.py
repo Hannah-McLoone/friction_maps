@@ -3,25 +3,20 @@ import pandas as pd
 import numpy as np
 import time
 import h5py
-from main_pipeline.values import ANGLE
+from values import ANGLE
 import sys
-
-"""
-currently rotate this 90 degrees anticlockwis - reformat my arrays rows and columns?
-
-polish up by making angle into ANGLE
-"""
+import rasterio
+from rasterio.transform import from_origin
+from rasterio.crs import CRS
 
 def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
-    resolution = 1 # how many km in square
-    angle = 0.008333333333333333333 / resolution
 
     duckdb.query("PRAGMA threads=8") 
 
 
 
-    i_vals = np.arange(int(xangle //angle), int(xangle //angle + x_n))
-    j_vals = np.arange(int(yangle //angle), int(yangle //angle + y_n))
+    i_vals = np.arange(int(xangle //ANGLE), int(xangle //ANGLE + x_n))
+    j_vals = np.arange(int(yangle //ANGLE), int(yangle //ANGLE + y_n))
     x_grid, y_grid = np.meshgrid(i_vals, j_vals, indexing="ij")
 
     pixels = np.stack([x_grid, y_grid], axis=-1)
@@ -62,22 +57,20 @@ if __name__ == "__main__":
     if len(sys.argv) != 4:
         print("Usage: python script <input_suffix> <output_file> <type_of_friction_map>")
     else:
-        input_suffix, output_file, type_of_friction_map = sys.argv[1], sys.argv[2]
+        input_suffix, output_file, type_of_friction_map = sys.argv[1], sys.argv[2], sys.argv[3]
         #example: input_suffix = 'output/pixel_to_road_speed' or 'maps/hm708/processed_land'
         #         type_of_friction_map = 'transportation'
-        #output_file must be h5 - 'road_friction_map.h5'
+        #output_file tiff - 'road_friction_map.h5'
         
         start_time = time.time()
 
         #change all of these to ANGLE
-        resolution = 1 # how many km in square
-        angle = 0.008333333333333333333 / resolution
 
 
-        y_angle = 90 - 500 * 0.008333333333333333333
+        y_angle = 90 - 500 * ANGLE
 
-        rows = int(180 / 0.008333333333333333333)
-        cols = int(360 / 0.008333333333333333333)
+        rows = int(180 / ANGLE)
+        cols = int(360 / ANGLE)
 
         if type_of_friction_map == 'transportation':
             selection = "SELECT input_pixels.pixel, COALESCE(MAX(read_parquet.speed_kph), 0) AS speed"
@@ -85,25 +78,56 @@ if __name__ == "__main__":
             selection = "SELECT input_pixels.pixel, COALESCE(SUM(read_parquet.speed * read_parquet.coverage) / NULLIF(SUM(read_parquet.coverage), 0), 0) AS speed"
 
         # Create HDF5 file
-        with h5py.File(output_file, 'w') as hdf5_file:
+        with h5py.File('temp_h5_file.hf', 'w') as hdf5_file:
             # Create datasets with specified dimensions and chunking
             var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
             while y_angle > -90:
                 print(y_angle)
-                result_array = create_friction_map_for_section(360 / angle,500, -180, y_angle, input_suffix , selection)
+                result_array = create_friction_map_for_section(360 / ANGLE,500, -180, y_angle, input_suffix , selection)
                 result_rows, cols = result_array.shape
 
                 # Append result_array to the dataset
                 var.resize((var.shape[0] + result_rows, cols))  # Resize the dataset to accommodate new data
                 var[-result_rows:, :] = result_array  # Append without full read
 
-                y_angle = y_angle  - 500 * 0.008333333333333333333
+                y_angle = y_angle  - 500 * ANGLE
 
-            remainder = (500 - (-90-y_angle)//angle )
-            result_array = create_friction_map_for_section(360 / angle,remainder, -180, -90, input_suffix, selection)
+            remainder = (500 - (-90-y_angle)//ANGLE )
+            result_array = create_friction_map_for_section(360 / ANGLE,remainder, -180, -90, input_suffix, selection)
             result_rows, cols = result_array.shape
             var.resize((var.shape[0] + result_rows, cols))
             var[-result_rows:, :] = result_array 
+
+
+
+        with h5py.File('temp_h5_file.hf', "r") as f:
+            # Assuming the only dataset is the array
+            dataset_name = list(f.keys())[0]
+            data = f[dataset_name][()]
+
+
+
+        # Create the geotransform
+        transform = from_origin(-180, 90, ANGLE, ANGLE)
+
+        # Define the CRS (WGS84)
+        crs = CRS.from_epsg(4326)
+
+        # Write the GeoTIFF
+        with rasterio.open(
+            output_file,
+            "w",
+            driver="GTiff",
+            height=data.shape[0],
+            width=data.shape[1],
+            count=1,
+            dtype=data.dtype,
+            crs=crs,
+            transform=transform,
+        ) as dst:
+            dst.write(data, 1)
+
+
 
         print(time.time() - start_time)
