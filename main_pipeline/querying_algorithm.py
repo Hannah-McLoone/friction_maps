@@ -59,8 +59,8 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python script <arg1> <arg2>")
+    if len(sys.argv) != 4:
+        print("Usage: python script <input_suffix> <output_file> <type_of_friction_map>")
     else:
         input_suffix, output_file, type_of_friction_map = sys.argv[1], sys.argv[2]
         #example: input_suffix = 'output/pixel_to_road_speed' or 'maps/hm708/processed_land'
