@@ -1,4 +1,4 @@
-#uses land_cover. do i want land cover or land???
+#uses land_cover
 
 import pandas as pd
 import paramiko
@@ -8,18 +8,18 @@ import pyarrow.dataset as ds
 import time
 import numpy as np
 from values import Land_values
-from values import ANGLE
+#from values import ANGLE
 import geopandas as gpd
 from shapely import wkb
 from shapely.geometry import Polygon
 import sys
 
 
+ANGLE = 1#need a way of overwriting for unit tests. get rid of this for running!!!!!!!!!!!!!!!!!!!!!
+
 def load_geometry_from_wkb_bytes(wkb_bytes):
     binary_wkb = wkb_bytes.hex()
     return wkb.loads(binary_wkb)
-
-
 
 
 def generate_coord_overlap(bbox, geometry):
@@ -32,7 +32,7 @@ def generate_coord_overlap(bbox, geometry):
     flat_geometries = np.column_stack([x_grid.ravel(), y_grid.ravel()])
 
     # Create the corner coordinates for the polygons
-    x_vals, y_vals = flat_geometries[:, 0] * ANGLE, flat_geometries[:, 1] * ANGLE# line that needs changing!!!!!!!!!!!!!!!!!!!!!!
+    x_vals, y_vals = flat_geometries[:, 0] * ANGLE, flat_geometries[:, 1] * ANGLE
     x0, y0 = x_vals, y_vals
     x1, y1 = x_vals, y_vals + ANGLE
     x2, y2 = x_vals + ANGLE, y_vals + ANGLE
@@ -48,44 +48,34 @@ def generate_coord_overlap(bbox, geometry):
     polygons = [Polygon(coords) for coords in polygons_array]
     geo_series = gpd.GeoSeries(polygons)
 
-    # Convert the geometry into a Shapely Polygon
-    geometry_polygon = Polygon(geometry)
+    #geometry_polygon = Polygon(geometry)# not needed
 
+    intersection_areas = geo_series.intersection(geometry).area # 95 percent of the time is spent on this line
 
-    #----------------------------------------------------------------------------------
-    #95 percent of the time is spent on this section few lines
-
-    #method 1: 
-    intersection_areas = geo_series.intersection(geometry_polygon).area
-
-    #method 2??:
-    #intersection_areas = geo_series.apply(lambda x: compute_area(x, geometry_polygon))
-
-    #----------------------------------------------------------------------------------
 
     # Extract pixel coordinates and areas
-    #takes the bottom left corner of the pixel as the identifier. is this the same as roads? Yes, yes it is
-    pixels = np.array([coords[0]/ANGLE for coords in polygons_array]) # this/ANGLE is the latest addition. to make it indexed by integer. change if i want to go back
+    #takes the bottom left corner of the pixel as the identifier.
+    pixels = np.array([coords[0]/ANGLE for coords in polygons_array]) # this/ANGLE to make it indexed by integer
     
-    return pixels, intersection_areas.values  # Convert the result to a numpy array
+    return pixels, intersection_areas.values
 
 
 
 
-def land_speed(subtype):#,given_class):
+def land_speed(subtype):
     return Land_values.land_type_speeds.get(subtype, 1)
 
 
 def format_into_land_table(table):
-    #table['subtype'] = table['subtype'].map(land_speed)
-    #table.rename(columns={'subtype': 'speed'}, inplace=True)
+    table['subtype'] = table['subtype'].map(land_speed)
+    table.rename(columns={'subtype': 'speed'}, inplace=True)
 
     #this line is about 5 percent of time
     table['geometry'] = gpd.GeoDataFrame(table['geometry'].apply(load_geometry_from_wkb_bytes), geometry='geometry', crs="EPSG:4326")
 
     #roughly the other 95 percent
     table[['pixel', 'coverage']] = table.apply(lambda row: pd.Series(generate_coord_overlap(row['bbox'], row['geometry'])), axis=1)
-
+    
     table = table.drop(['bbox','geometry'], axis = 1)
     table = table.explode(['pixel', 'coverage'])
     table = table[table['coverage'] != 0]

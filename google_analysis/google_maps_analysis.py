@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 api_key = os.getenv("API_KEY")
-
+#this file needs to be reprocced in the better way apparently !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 angle = 0.008333333333333333333
 
@@ -96,14 +96,14 @@ def shortest_path_cost(friction_map, start, end):
 
 
 
-
-with h5py.File('uk_roads.h5', 'r') as f:
+with h5py.File('google_analysis/uk_roads.h5', 'r') as f:
     # Get the first dataset in the file
     dataset = next(iter(f.values()))
     data = dataset[:]
 
 
 friction_map = 1/(data)
+
 
 # Randomly select 10 indices from the non-zero ones (or fewer if there aren’t 10)
 #non_zero_indices = [(i, j) for i in range(data.shape[0]) for j in range(data.shape[1]) if data[i, j] != 0]
@@ -113,13 +113,12 @@ friction_map = 1/(data)
 
 
 
-#kill---------------------------------------
-
+#kill--------------------------------------
 
 import ast
 
 # Load the CSV file
-df = pd.read_csv("comparison_to_google.csv")  # Replace with your actual file path
+df = pd.read_csv("google_analysis/comparison_to_google.csv")
 
 # Convert 'start_indices' and 'destination_indices' from strings to tuples
 df['start_indices'] = df['start_indices'].apply(ast.literal_eval)
@@ -131,6 +130,8 @@ df['values'] = df.apply(lambda row: shortest_path_cost(friction_map,row['start_i
 
 print(len(df['truth']))
 print(len(df['values']))
+
+
 #---------------------------------------------------
 
 """
@@ -172,11 +173,36 @@ for i in range(0,len(selected_indices)-1):
 #df.to_csv('comparison_to_google.csv', mode='a', index=False, header=False)
 
 #"""
-print(df['values'])
-plt.scatter(df['truth'], df['values'])
-plt.plot(df['truth'], df['truth'], linestyle='-', color='gray')  # x = y line
 
-plt.xlabel('truth')
-plt.ylabel('cost')
+#df = pd.read_csv("google_analysis/comparison_to_google.csv")
 
-plt.show()
+#plt.scatter(df['truth'], df['values'])
+#plt.plot(df['truth'], df['truth'], linestyle='-', color='gray')  # x = y line
+
+#plt.xlabel('truth')
+#plt.ylabel('value')
+
+#plt.show()
+
+import numpy as np
+
+df = df[df['values']>0]
+df = df[df['truth']>0]
+df = df[['truth', 'values']].apply(pd.to_numeric, errors='coerce').dropna()
+df = df.replace([np.inf, -np.inf], np.nan).dropna()
+
+y_true = df['truth']
+y_pred = df['values']
+
+# Mean Squared Error (MSE)
+errors = y_true - y_pred
+
+#ytrue has infinite in it.
+mse = (errors ** 2).mean()
+
+ss_res = ((y_true - y_pred) ** 2).sum()
+ss_tot = ((y_true - y_true.mean()) ** 2).sum()
+r_squared = 1 - (ss_res / ss_tot)
+
+print(f"Mean Squared Error (MSE): {mse}")
+print(f"R-squared (R²): {r_squared}")

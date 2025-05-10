@@ -5,6 +5,8 @@ import rasterio
 import random
 import csv
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
 
 """
 extension:
@@ -32,6 +34,7 @@ def create_table(coords):
     """
 
     result = duckdb.query(query).df()
+    result = result[result['subtype'] != 'land']
     pivot_df = result.pivot(index='pixel', columns='subtype', values='total_coverage').fillna(0)
     for col in ["barren", "crop", "forest", "grass", "mangrove", "moss", "shrub", "snow", "urban", "wetland","desert","glacier", "physical", "reef", "rock","sand","tree"]:
         if col not in pivot_df.columns:
@@ -40,8 +43,8 @@ def create_table(coords):
     pivot_df.fillna(0, inplace=True)
     pivot_df = pivot_df.loc[cord_list].reset_index()
 
-    if 'land' in pivot_df['pixel'].values:
-        pivot_df = pivot_df[pivot_df['pixel'] != 'land']
+    #if 'land' in pivot_df['pixel'].values:
+    #    pivot_df = pivot_df[pivot_df['pixel'] != 'land']
 
     return(pivot_df)
 
@@ -61,29 +64,30 @@ def get_weiss_value(coords): # these are float coords
     resolution = 0.008333333333333333333
 
     with rasterio.open('2020_walking_only_friction_surface.geotiff') as src:
-        band1 = src.read(1)  # Read once instead of in the loop
+        band1 = src.read(1)
         index = src.index
         for x, y in coords:
             col, row = index(x * resolution, y * resolution)
             values.append(band1[col,row])#
 
+
     with rasterio.open('/maps/hm708/slope_1KMmd_SRTM.tif') as src:
-        band1 = src.read(1)  # Read once instead of in the loop
+        band1 = src.read(1)
         index = src.index
         for i in range(0, len(coords)):
             x,y = coords[i]
             col, row = index(x * resolution, y * resolution)
             slope_scaling = toblers_walking_speed(band1[col, row]) / 5
-            values[i] = values[i] / slope_scaling
+            values[i] = values[i] * slope_scaling
 
     with rasterio.open('/maps/hm708/elevation_1KMmd_SRTM.tif') as src:
-        band1 = src.read(1)  # Read once instead of in the loop
+        band1 = src.read(1)
         index = src.index
         for i in range(0, len(coords)):
             x,y = coords[i]
             col, row = index(x * resolution, y * resolution)
             elevation_scaling = elevation_adjustment(band1[col,row])
-            values[i] = values[i] / elevation_scaling
+            values[i] = values[i] * elevation_scaling
     print('finished creating weiss values')
     return values
 
@@ -119,21 +123,36 @@ def calculate_speed(table, params):
     # Calculate weighted sum and total coverage
     weighted_sum = table[land_columns].mul(speed_series)
     coverage_sum = table[land_columns].sum(axis=1)
-    weighted_avg_speed = np.where(coverage_sum == 0, 0, weighted_sum.sum(axis=1) / coverage_sum)
+    weighted_avg_speed = np.where(coverage_sum == 0, 0, weighted_sum.sum(axis=1) / coverage_sum)#call this something better now it is min per mitre
+    weighted_avg_speed[weighted_avg_speed == 0] = 0.1
+    weighted_avg_speed = 60 / (weighted_avg_speed* 1000)
     return weighted_avg_speed
     
-
-
-from sklearn.model_selection import train_test_split
 
 resolution = 0.008333333333333333
 coordinates = []
 
 # Generate 100,000 random coordinates
-for _ in range(100000):
-    x = random.uniform(-179.9, 179.9)
-    y = random.uniform(-59.9, 84.9)
+for _ in range(5000000):
+    x = random.uniform(60,110)#(-179.9, 179.9)
+    y = random.uniform(40,60)#(-59.9, 84.9)
     coordinates.append((x // resolution, y // resolution))
+
+for _ in range(2000000):
+    x = random.uniform(100,125)#(-179.9, 179.9)
+    y = random.uniform(0,20)#(-59.9, 84.9)
+    coordinates.append((x // resolution, y // resolution))
+
+
+for _ in range(3000000):
+    x = random.uniform(-80,-50)#(-179.9, 179.9)
+    y = random.uniform(-10,10)#(-59.9, 84.9)
+    coordinates.append((x // resolution, y // resolution))
+
+
+
+
+
 
 # Get the corresponding truth values
 truth = get_weiss_value(coordinates)
@@ -161,12 +180,14 @@ result = least_squares(residuals, initial_guess, loss='linear')
 
 # Save result
 print(result.x)
-with open('optimized_parameters.csv', 'w', newline='') as f:
-    csv.writer(f).writerow(result.x)
 
 # Optionally: Evaluate on test set
 predicted_test = calculate_speed(table_test, result.x)
+
+df = pd.DataFrame({"predicted": predicted_test, "actual": truth_test})
+df.to_csv("predicted_vs_actual.csv", index=False)
+
 error = np.array(predicted_test) - np.array(truth_test)
 print('Test RMSE:', np.sqrt(np.mean(error**2)))
 
-
+pd.Series(result.x).to_csv("optimized_parameters.csv", index=False, header=False)

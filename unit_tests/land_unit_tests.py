@@ -1,4 +1,4 @@
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, MultiPolygon
 #from values import ANGLE
 ANGLE = 1
 import pandas as pd
@@ -10,6 +10,12 @@ import numpy as np
 #how i want to index pixels
 #underflow? printing off small values rounds inccorecclty, is it being stored correctly?
 
+
+"""
+need to change speeds so they match current values
+
+
+"""
 
 import sys
 import os
@@ -38,7 +44,15 @@ def create_bounding_box(shape):
 #    return dumps(Polygon(shape), hex=True)
 
 def polygon_to_hex(shape) -> bytes:
-    return bytes.fromhex(dumps(Polygon(shape), hex=True))
+    #return bytes.fromhex(dumps(Polygon(shape), hex=True))
+    shape2 = [(5, 6), (6.5, 5), (5, 4), (3.5, 5)]
+    shape1 = [(1.5, 3), (3, 1.5), (1.5, 0), (0, 1.5)]
+
+    # Create a MultiPolygon
+    multi = MultiPolygon([Polygon(shape1), Polygon(shape2)])
+
+    # Get the WKB hex representation and convert to bytes
+    return bytes.fromhex(dumps(multi, hex=True))
 
 def generate_unit_test_data(shapes, subtypes):
     table = pd.DataFrame({'geometry':[polygon_to_hex(shape) for shape in shapes], 'bbox':[create_bounding_box(shape) for shape in shapes], 'subtype':subtypes})
@@ -76,6 +90,7 @@ def compare_dataframes_ignore_order(df1, df2):
     df1_clean = df1_clean[common_columns].round(3)
     df2_clean = df2_clean[common_columns].round(3)
 
+
     # Sort rows and compare
     df1_sorted = df1_clean.sort_values(by=common_columns).reset_index(drop=True)
     df2_sorted = df2_clean.sort_values(by=common_columns).reset_index(drop=True)
@@ -89,7 +104,20 @@ def compare_dataframes_ignore_order(df1, df2):
 #grass = 12
 #forest = 5
 
+shape = [(1.5, 3), (3, 1.5), (1.5, 0), (0, 1.5)]
+unit_test_data = generate_unit_test_data([scale_tuples(shape)], subtypes = ['grass'])
+df1 = format_into_land_table(unit_test_data)
+pixels = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]]
+speeds = [12,12,12,12,12,12,12,12,12]
+coverage = [1/8,6/8,1/8,6/8,1,6/8,1/8,6/8,1/8]
+df2 = pd.DataFrame({'pixel':pixels, 'coverage':coverage,'speed':speeds})
+print(compare_dataframes_ignore_order(df1, df2))
+print(df1)
 
+print(df2)
+
+
+"""
 shape = [(1.5, 3), (3, 1.5), (1.5, 0), (0, 1.5)]
 unit_test_data = generate_unit_test_data([scale_tuples(shape)], subtypes = ['grass'])
 df1 = format_into_land_table(unit_test_data)
@@ -147,3 +175,4 @@ speeds = [4,4,4,4,12,12,12,12,5,5,5,5]
 coverage = [math.pi/16,math.pi/16,math.pi/16,math.pi/16,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
 df2 = pd.DataFrame({'pixel':pixels, 'coverage':coverage,'speed':speeds})
 print(compare_dataframes_ignore_order(df1, df2))
+"""

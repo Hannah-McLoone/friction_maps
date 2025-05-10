@@ -1,10 +1,10 @@
 import paramiko
 
 # Configuration
-hostname = 'sherwood.cl.cam.ac.uk'  # or 'kinabalu.cl.cam.ac.uk'
+hostname = 'sherwood.cl.cam.ac.uk' 
 port = 22  # Default SSH port
-username = 'hm708'  # Replace with your actual CSRid
-private_key_path = '/Users/hanna/.ssh/id_rsa'  # Path to your private key file
+username = 'hm708'
+private_key_path = '/Users/hanna/.ssh/id_rsa'  # Path to private key file
 
 def create_connection():
     try:

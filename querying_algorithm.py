@@ -26,11 +26,11 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
     x_grid, y_grid = np.meshgrid(i_vals, j_vals, indexing="ij")
 
     pixels = np.stack([x_grid, y_grid], axis=-1)
-    pixels = np.rot90(pixels)#**********
+    pixels = np.rot90(pixels)#***
 
 
 
-    flat_pixels = [f"[{x}, {y}]" for x, y in pixels.reshape(-1, 2)] # this is the slow line!
+    flat_pixels = [f"[{x}, {y}]" for x, y in pixels.reshape(-1, 2)] # this could be made faster by formatting x and y better
 
     df = pd.DataFrame({"pixel": flat_pixels})
     df['original_index'] = df.index
