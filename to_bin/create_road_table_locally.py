@@ -1,7 +1,7 @@
 import pandas as pd
 import pyarrow.parquet as pq
-from values import Values
-from creating_road_speed_table import format_into_road_table
+from main_pipeline.values import Values
+from main_pipeline.creating_road_speed_table import format_into_road_table
 from create_connection import create_connection
 
 """

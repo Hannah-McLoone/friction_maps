@@ -5,7 +5,7 @@ import paramiko
 import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 import time
-from values import Values, water_values
+from main_pipeline.values import Values, water_values
 import random
 
 # --select 1000 roads from each file

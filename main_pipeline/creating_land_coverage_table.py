@@ -7,7 +7,7 @@ import pyarrow as pa
 import pyarrow.dataset as ds
 import time
 import numpy as np
-from values import Land_values
+from main_pipeline.values import Land_values
 #from values import ANGLE
 import geopandas as gpd
 from shapely import wkb

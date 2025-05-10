@@ -20,7 +20,7 @@ need to change speeds so they match current values
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))# fix this
-from creating_land_coverage_table import format_into_land_table
+from main_pipeline.creating_land_coverage_table import format_into_land_table
 
 
 
