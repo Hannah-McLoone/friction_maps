@@ -39,7 +39,7 @@ wait  # wait for any remaining background jobs to finish
 
 # add the querying script
 echo "All road preprocessing done. Now assembling road friction map..."
-python3 querying_algorithm.py "$OUTPUT_BASE" "$FRICTION_MAP_PATH" "transportation"
+python3 querying_algorithm.py "$OUTPUT_BASE" "$FRICTION_MAP_PATH1" "transportation"
 # input_suffix, output_file, type_of_friction_map
 wait
 

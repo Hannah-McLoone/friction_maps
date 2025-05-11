@@ -105,36 +105,11 @@ with h5py.File('google_analysis/uk_roads.h5', 'r') as f:
 friction_map = 1/(data)
 
 
-# Randomly select 10 indices from the non-zero ones (or fewer if there aren’t 10)
-#non_zero_indices = [(i, j) for i in range(data.shape[0]) for j in range(data.shape[1]) if data[i, j] != 0]
-#selected_indices = random.sample(non_zero_indices,  10)
+# Randomly select 500 indices from the non-zero ones
+non_zero_indices = [(i, j) for i in range(data.shape[0]) for j in range(data.shape[1]) if data[i, j] != 0]
+selected_indices = random.sample(non_zero_indices,  500)
 
 
-
-
-
-#kill--------------------------------------
-
-import ast
-
-# Load the CSV file
-df = pd.read_csv("google_analysis/comparison_to_google.csv")
-
-# Convert 'start_indices' and 'destination_indices' from strings to tuples
-df['start_indices'] = df['start_indices'].apply(ast.literal_eval)
-df['desitnation_indices'] = df['desitnation_indices'].apply(ast.literal_eval)
-
-
-
-df['values'] = df.apply(lambda row: shortest_path_cost(friction_map,row['start_indices'], row['desitnation_indices']), axis=1)
-
-print(len(df['truth']))
-print(len(df['values']))
-
-
-#---------------------------------------------------
-
-"""
 
 
 table = {
@@ -170,19 +145,11 @@ for i in range(0,len(selected_indices)-1):
     df = pd.concat([df, new_row], ignore_index=True)
 
 
-#df.to_csv('comparison_to_google.csv', mode='a', index=False, header=False)
+df.to_csv('comparison_to_google.csv', mode='a', index=False, header=False)
 
-#"""
+
 
 #df = pd.read_csv("google_analysis/comparison_to_google.csv")
-
-#plt.scatter(df['truth'], df['values'])
-#plt.plot(df['truth'], df['truth'], linestyle='-', color='gray')  # x = y line
-
-#plt.xlabel('truth')
-#plt.ylabel('value')
-
-#plt.show()
 
 import numpy as np
 

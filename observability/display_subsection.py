@@ -7,27 +7,23 @@ import matplotlib.pyplot as plt
 
 
 tiff_file = "friction_map.tif"
-# goes down and right (east and south) from point x,y
-y = 60
-x = -5
 
 
-
-start_row =  int((90-y) / 0.008333333333333333333 )
-end_row = start_row + 1200
-start_col =  int((180+x) / 0.008333333333333333333 )
-end_col = start_col + 800
-
-
-# Open the existing HDF5 file in read mode
+#change this so i dont need to do w load of maths!!!!!!!!!!!!!!!!!!!! it just uses tiff referennceing 
+min_lon, min_lat = -11.0, 50  # example lower-left corner
+max_lon, max_lat = 2, 60  # example upper-right corner
 
 with rasterio.open(tiff_file) as src:
+    # Convert coordinates to row, col indices
+    start_col, start_row = src.index(min_lon, max_lat)  # top-left
+    end_col, end_row = src.index(max_lon, min_lat)      # bottom-right
+
     # Read the full first band
     data = src.read(1)
 
     # Sample the square section
     sampled_section = data[start_row:end_row, start_col:end_col]
-    #sampled_section = np.minimum(sampled_section, 113)
+
 
 
 rows, cols = sampled_section.shape

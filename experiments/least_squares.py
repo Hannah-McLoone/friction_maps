@@ -8,12 +8,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-"""
-extension:
-choose specific sub areas
-"""
-
-
 def create_table(coords):
     filename = '/maps/hm708/processed_land_without_speed'
     cord_list = [f"[{x}, {y}]" for (x, y) in coords]
@@ -42,9 +36,6 @@ def create_table(coords):
     
     pivot_df.fillna(0, inplace=True)
     pivot_df = pivot_df.loc[cord_list].reset_index()
-
-    #if 'land' in pivot_df['pixel'].values:
-    #    pivot_df = pivot_df[pivot_df['pixel'] != 'land']
 
     return(pivot_df)
 
@@ -104,16 +95,7 @@ def calculate_speed(table, params):
         "shrub": params[6],
         "snow": params[7],
         "urban": params[8],
-        "wetland": params[9],   
-
-
-        "desert": params[10],
-        "glacier": params[11],
-        "physical": params[12],
-        "reef": params[13],
-        "rock": params[14],
-        "sand": params[15],
-        "tree": params[16]
+        "wetland": params[9]   
     }
     speed_series = pd.Series(landtype_to_speed)
 
@@ -123,10 +105,10 @@ def calculate_speed(table, params):
     # Calculate weighted sum and total coverage
     weighted_sum = table[land_columns].mul(speed_series)
     coverage_sum = table[land_columns].sum(axis=1)
-    weighted_avg_speed = np.where(coverage_sum == 0, 0, weighted_sum.sum(axis=1) / coverage_sum)#call this something better now it is min per mitre
+    weighted_avg_speed = np.where(coverage_sum == 0, 0, weighted_sum.sum(axis=1) / coverage_sum)
     weighted_avg_speed[weighted_avg_speed == 0] = 0.1
-    weighted_avg_speed = 60 / (weighted_avg_speed* 1000)
-    return weighted_avg_speed
+    min_per_metre = 60 / (weighted_avg_speed* 1000)
+    return min_per_metre
     
 
 resolution = 0.008333333333333333
@@ -168,7 +150,7 @@ def residuals(params):
     return sample - truth_train
 
 # Optimization
-initial_guess = np.ones(17)
+initial_guess = np.ones(10)
 table_train = create_table(coords_train)
 table_test = create_table(coords_test)
 

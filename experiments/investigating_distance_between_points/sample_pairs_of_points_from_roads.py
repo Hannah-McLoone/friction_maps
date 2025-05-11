@@ -58,25 +58,21 @@ def test(remote_directory,coord_file):
         sampled_df.to_csv('amazon_sample.csv', mode='a', index=False, header=not pd.io.common.file_exists(file_path))
 
 
-# theres 2243540 in file 1
+# theres 2243540 roads in file 1
+#if i sample 1 in every 10000 roads, thats about 200
 #2243540 / 10000 =~= 200
 
-
-#empty_df = pd.DataFrame()
-#empty_df.to_csv('amazon_sample.csv', index=False)#no!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-#go from 4
+#accross 50 files this is about 10000 samples
 
 
 
 
-
+#before everything was running on server was connecting with paramiko
 # Configuration
-hostname = 'sherwood.cl.cam.ac.uk'  # or 'kinabalu.cl.cam.ac.uk'
-port = 22  # Default SSH port
-username = 'hm708'  # Replace with your actual CSRid
-private_key_path = '/Users/hanna/.ssh/id_rsa'  # Path to your private key file
+hostname = 'sherwood.cl.cam.ac.uk' 
+port = 22  
+username = 'hm708'  
+private_key_path = '/Users/hanna/.ssh/id_rsa'
 
 def create_connection():
     try:
@@ -99,6 +95,3 @@ test('/maps/sj514/overture/theme=transportation/type=segment', "file_cords_of_tr
 end_time = time.time()
 
 print(end_time - start_time)
-
-
-#start from n = 40

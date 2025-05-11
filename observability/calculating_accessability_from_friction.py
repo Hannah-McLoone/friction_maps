@@ -6,44 +6,7 @@ import seaborn as sns
 
 import numpy as np
 import heapq
-
 ANGLE = 0.008333333333333333333
-
-def marching_wavefront(friction_map, goals):
-    height, width = friction_map.shape
-    cost_map = np.full((height, width), np.inf)
-    visited = np.full((height, width), False)
-
-    # Initialize wavefront with all goals
-    wavefront = []
-    for goal_y, goal_x in goals:
-        cost_map[goal_y, goal_x] = 0
-        heapq.heappush(wavefront, (0, goal_y, goal_x))  # (cost, y, x)
-
-    # 4-connected grid movement
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-    while wavefront:
-        current_cost, y, x = heapq.heappop(wavefront)
-
-        if visited[y, x]:
-            continue
-        visited[y, x] = True
-
-        for dy, dx in directions:
-            ny, nx = y + dy, x + dx
-            if 0 <= ny < height and 0 <= nx < width and not visited[ny, nx]:
-                travel_cost = friction_map[ny, nx]
-                new_cost = current_cost + travel_cost
-                if new_cost < cost_map[ny, nx]:
-                    cost_map[ny, nx] = new_cost
-                    heapq.heappush(wavefront, (new_cost, ny, nx))
-
-    return cost_map
-
-
-import numpy as np
-import heapq
 
 def arcsecond_wavefront(friction_map, goals, lat_start_deg, arcsec_resolution=1):
     height, width = friction_map.shape

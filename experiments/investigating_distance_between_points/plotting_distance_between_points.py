@@ -67,8 +67,12 @@ def get_y(points):
 
 # File path
 
-file_path = 'investigating_distance_between_points/sample_of_road_points.csv' # depending on working directory get rid of the file name
+file_path = 'investigating_distance_between_points/sample_of_road_points.csv' 
 file_path = 'investigating_distance_between_points/amazon_sample.csv'
+#decide which of the two tests im running, global or south americ.
+#if south america, use line 85 to select Amazon
+
+
 df = pd.read_csv(file_path)
 df = df[df['class'] == 'unclassified']
 print(len(df))
@@ -77,20 +81,15 @@ df['x'] = df['geometry'].map(get_x)
 df['y'] = df['geometry'].map(get_y)
 
 
-df = df[df['x'] > -80]
 
 #df = df[(df['x'] + 63)**2 + (df['y'] + 3)**2 < 100]
-print(len(df))
 max_value = 0.5
 import numpy as np
 bins = np.linspace(0, max_value, 50)
 df['distance_km'] = df['distance_km'].apply(lambda x: min(x, max_value))
 
 
-"""
 sns.histplot(df['distance_km'], bins=bins)
-
-#plt.yscale('log') if i want the logged version
 
 plt.title('Unclassified', fontsize=16)
 plt.xlabel('Distance', fontsize=14)
@@ -98,14 +97,15 @@ plt.ylabel('Frequency', fontsize=14)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
 
-"""
 
 
-#"""
+
+#____________________________________________________________________________________
+
+
 #this is the code for visualising how area plays a factor
 # plots the points on global map
-df = df[df['x'] < -30]
-df = df[df['y'] > -60]
+
 from matplotlib.colors import Normalize
 #plt.figure(figsize=(15, 6))
 plt.figure(figsize=(7, 6))
@@ -122,8 +122,12 @@ plt.ylabel('Y Coordinate')
 # Show plot
 plt.show()
 
-#"""
-"""
+
+
+#_______________________________________________________________________________________________
+#this is the code for running the monte carlo simulation
+
+
 
 import random
 import math
@@ -171,18 +175,12 @@ plt.ylabel('Proportion of points in neighbor boxes')
 plt.axhline(y=0.95, color='red', linestyle='--', label='95% line')
 
 
-if log_display:
-    plt.xscale('log')#!!!!!
-    plt.xlabel('Resolution (log scale)')
-    plt.grid(True, which='both', ls='--')#!!!!!
-else:
-    plt.xlabel('Resolution')
-    plt.grid(True)
+
+plt.xlabel('Resolution')
+plt.grid(True)
     
 plt.tight_layout()
 plt.show()
 
 print(results)
 
-
-"""
