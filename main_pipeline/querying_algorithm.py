@@ -135,6 +135,6 @@ if __name__ == "__main__":
         import csv
         current_time = time.time()
 
-        with open(f'timing_log{type_of_friction_map}.csv', mode='a', newline='') as file:
+        with open(f'timing_log{type_of_friction_map}.csv', mode='a', newline='') as file: # delete this
             writer = csv.writer(file)
             writer.writerow([start_time, current_time])

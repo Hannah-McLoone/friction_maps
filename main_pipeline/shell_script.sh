@@ -48,7 +48,7 @@ running=0
 
 for i in $(seq 0 83); do
   PART_NUM=$(printf "%05d" $i)
-  INPUT_FILE2="${INPUT_BASE2}/part-${PART_NUM2}${SUFFIX2}"
+  INPUT_FILE2="${INPUT_BASE2}/part-${PART_NUM}${SUFFIX2}"
   OUTPUT_FILE2="${OUTPUT_BASE2}${i}.parquet"
 
   echo "Running: python3 creating_land_coverage_table.py '$INPUT_FILE2' '$OUTPUT_FILE2'"

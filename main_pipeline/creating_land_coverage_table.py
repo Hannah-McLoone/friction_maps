@@ -63,7 +63,7 @@ def generate_coord_overlap(bbox, geometry):
 
 
 def land_speed(subtype):
-    return Land_values.land_type_speeds.get(subtype, 1)
+    return Land_values.land_cover_type_speeds.get(subtype, 1)
 
 
 def format_into_land_table(table):
