@@ -16,7 +16,7 @@ MAX_PROCS=6
 
 
 
-
+# pre-processing roads
 running=0
 for i in $(seq 0 49); do
     PART_NUM=$(printf "%05d" $i)
@@ -37,13 +37,14 @@ done
 wait  # wait for any remaining background jobs to finish
 
 
-# add the querying script
+# assembling friction surface
 echo "All road preprocessing done. Now assembling road friction map..."
 python3 querying_algorithm.py "$OUTPUT_BASE" "$FRICTION_MAP_PATH1" "transportation"
 # input_suffix, output_file, type_of_friction_map
 wait
 
 
+# pre-processing land
 running=0
 
 for i in $(seq 0 83); do
@@ -64,6 +65,7 @@ done
 
 wait
 
+#assembling friction surface
 echo "All land preprocessing done. Now assembling land friction map..."
 python3 querying_algorithm.py "$OUTPUT_BASE2" "$FRICTION_MAP_PATH2" "land"
 

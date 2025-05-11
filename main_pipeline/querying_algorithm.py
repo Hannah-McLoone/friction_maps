@@ -15,7 +15,7 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
     duckdb.query("PRAGMA threads=8") 
 
 
-
+    #create list of all the pixels in the strip
     i_vals = np.arange(int(xangle //ANGLE), int(xangle //ANGLE + x_n))
     j_vals = np.arange(int(yangle //ANGLE), int(yangle //ANGLE + y_n))
     x_grid, y_grid = np.meshgrid(i_vals, j_vals, indexing="ij")
@@ -45,6 +45,8 @@ def create_friction_map_for_section(x_n, y_n,xangle,yangle,filename,selection):
 
     result = duckdb.query(query).df()
 
+    #it comes as one flat result. need to format back into the strip
+
     def break_list_into_sublists_numpy(array, n):
         return np.array_split(array, n)
 
@@ -73,6 +75,8 @@ if __name__ == "__main__":
         rows = int(180 / ANGLE)
         cols = int(360 / ANGLE)
 
+
+        #the transport and land friction map are assembled in very similar ways. it is only the first line of the query that is different
         if type_of_friction_map == 'transportation':
             selection = "SELECT input_pixels.pixel, COALESCE(MAX(read_parquet.speed_kph), 0) AS speed"
         else:
@@ -83,17 +87,22 @@ if __name__ == "__main__":
             # Create datasets with specified dimensions and chunking
             var = hdf5_file.create_dataset('data', (0, cols), maxshape=(None, cols), dtype='f4', chunks=(500, cols), compression='gzip')
 
+
+            #the friction map is assembled in strips of height 500 pixels.
             while y_angle > -90:
                 print(y_angle)
                 result_array = create_friction_map_for_section(360 / ANGLE,500, -180, y_angle, input_suffix , selection)
                 result_rows, cols = result_array.shape
 
                 # Append result_array to the dataset
-                var.resize((var.shape[0] + result_rows, cols))  # Resize the dataset to accommodate new data
+                var.resize((var.shape[0] + result_rows, cols))
                 var[-result_rows:, :] = result_array  # Append without full read
 
-                y_angle = y_angle  - 500 * ANGLE
+                y_angle = y_angle  - 500 * ANGLE #move to next strop
 
+
+            #the final little bit at the end. is the laft fraction of a strip
+            #need to work out the remainder
             remainder = (500 - (-90-y_angle)//ANGLE )
             result_array = create_friction_map_for_section(360 / ANGLE,remainder, -180, -90, input_suffix, selection)
             result_rows, cols = result_array.shape

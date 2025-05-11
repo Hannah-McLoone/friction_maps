@@ -58,10 +58,12 @@ def extract_speed(row):
 def format_into_road_table(table):
     table['speed_kph'] = table.apply(extract_speed, axis=1)
     table['geometry'] = table['geometry'].map(wkb.loads)
+
+    #for every point in the road object, calculate the pixel its in
     table['pixel'] = table['geometry'].map(grid_loc)
     table = table.drop(['geometry'], axis = 1)
 
-
+    #explode this list of pixels, so that they are all different entries in the database
     mega_table = table[['pixel','speed_kph']].explode('pixel')
     return(mega_table)
 

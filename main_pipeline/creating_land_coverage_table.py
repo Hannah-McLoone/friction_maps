@@ -1,5 +1,3 @@
-#uses land_cover
-
 import pandas as pd
 import paramiko
 import pyarrow.parquet as pq
@@ -14,6 +12,10 @@ from shapely import wkb
 from shapely.geometry import Polygon
 import sys
 
+"""
+this is the file for pre-processing data from the land_cover dataset
+it maps each object to a speed, and calculates the area of overlap with each pixel it overlaps
+"""
 
 #ANGLE = 1#need a way of overwriting for unit tests. get rid of this for running!!!!!!!!!!!!!!!!!!!!!
 
@@ -44,12 +46,16 @@ def generate_coord_overlap(bbox, geometry):
                                np.column_stack((x2, y2)),
                                np.column_stack((x3, y3))], axis=1)
 
+    #polygons_array now contains the points to define each pixel that is overlapped by the land object
+
+    #each pixel gets converted to polygon objects so that overlap calculations can be performed
     # Create a GeoSeries of Shapely Polygons
     polygons = [Polygon(coords) for coords in polygons_array]
     geo_series = gpd.GeoSeries(polygons)
 
-    #geometry_polygon = Polygon(geometry)# not needed
 
+
+    #for each of these pixels, cacluate overlap
     intersection_areas = geo_series.intersection(geometry).area # 95 percent of the time is spent on this line
 
 
@@ -83,13 +89,14 @@ def format_into_land_table(table):
     return table
 
 
-def parquet_file_to_database(input_file, output_file, chunk_size=100): # more ram efficient to be reading and processing in chunks
+def parquet_file_to_database(input_file, output_file, chunk_size=100):
     reader = pq.ParquetFile(input_file)
     
     first_chunk = True
     writer = None
     
-    for batch in reader.iter_batches(batch_size=chunk_size):
+    for batch in reader.iter_batches(batch_size=chunk_size): # more ram efficient to be reading and processing in chunks
+        # read from source, process, write to output
         table = batch.to_pandas()
         
         if {'subtype', 'geometry', 'bbox'}.issubset(table.columns):

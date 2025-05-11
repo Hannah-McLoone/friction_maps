@@ -39,8 +39,8 @@ def apply_scaling_to_data(my_data_path = 'land_friction_map.tif'
     scale = 1 / (slope_adjustment_factor * elevation_factor)
 
     #the elevation and slope data i am using only has data between the latitudes of 60 and -60
-    # does this assume my data is same shape as elevation???
-    #what aout different resolutions!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # this assumes my_data is same shape as elevation
+    #need other data source for other resolutions
     total_rows = my_data.shape[0]
     rows_per_degree = total_rows // 180 
     start_row = 30 * rows_per_degree  # 90°N to 60°N = 30°
