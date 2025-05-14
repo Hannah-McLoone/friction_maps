@@ -9,7 +9,7 @@ import sys
 def toblers_walking_speed(slope):
     slope_rad = np.radians(slope)
     adjusted_slope = np.abs(np.tan(slope_rad) + 0.05)
-    return min(5,6 * np.exp(-3.5 * adjusted_slope))
+    return np.minimum(5,6 * np.exp(-3.5 * adjusted_slope))
 
 def elevation_adjustment(elevation):
     return 1.016 * np.exp(-0.0001072 * elevation)

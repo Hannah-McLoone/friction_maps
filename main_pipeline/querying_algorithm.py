@@ -111,12 +111,14 @@ if __name__ == "__main__":
 
 
 
-        with h5py.File('temp_h5_file.hf', "r") as f:
+        with h5py.File('land_speed_map.hf', "r") as f:
             # Assuming the only dataset is the array
             dataset_name = list(f.keys())[0]
             data = f[dataset_name][()]
+        
+        friction = 60/(1000*data)
 
-        os.remove('temp_h5_file.hf')
+        #os.remove('temp_h5_file.hf')
 
 
 
@@ -131,19 +133,11 @@ if __name__ == "__main__":
             output_file,
             "w",
             driver="GTiff",
-            height=data.shape[0],
-            width=data.shape[1],
+            height=friction.shape[0],
+            width=friction.shape[1],
             count=1,
-            dtype=data.dtype,
+            dtype=friction.dtype,
             crs=crs,
             transform=transform,
         ) as dst:
-            dst.write(data, 1)
-
-
-        import csv
-        current_time = time.time()
-
-        with open(f'timing_log{type_of_friction_map}.csv', mode='a', newline='') as file: # delete this
-            writer = csv.writer(file)
-            writer.writerow([start_time, current_time])
+            dst.write(friction, 1)

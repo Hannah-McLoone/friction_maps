@@ -77,9 +77,9 @@ def calculate_speed(table, params, scale):
         "mangrove": params[4],
         "moss": params[5],
         "shrub": params[6],
-        "snow": params[7],
-        "urban": params[8],
-        "wetland": params[9]   
+        "snow": 1.62,#params[7],
+        "urban": params[7],
+        "wetland": params[8]   
     }
     speed_series = pd.Series(landtype_to_speed)
 
@@ -101,7 +101,7 @@ coordinates = []
 
 
 
-for _ in range(1000000):
+for _ in range(30000000):
     x = random.uniform(-179.9, 179.9)
     y = random.uniform(-59.9, 59.9)
     coordinates.append((x // resolution, y // resolution))
@@ -165,22 +165,25 @@ truth_train = np.array(truth_train)
 # Define residuals function using training data
 def residuals(params):
     sample = np.array(calculate_speed(table_train, params, scalings_train))
-    return (sample - truth_train) / truth_train
+    return (sample - truth_train)/truth_train
 
 # Optimization
-initial_guess = np.ones(10)
+#initial_guess = np.ones(10)
+initial_guess = np.array([4,3.3,4.9,6,1.2,6,5,1.62,1.9,1])
+initial_guess = np.array([4,3.3,4.9,6,1.2,6,5,1.9,1])
 
 print('starting least squares')
 result = least_squares(residuals, initial_guess, loss='linear')
 
+print('finished least squares')
 # Save result
-print(result.x)
+params = result.x
 
 # Optionally: Evaluate on test set
-predicted_test = calculate_speed(table_test, result.x, scalings_test)
+predicted_test = calculate_speed(table_test, params, scalings_test)
 
 df = pd.DataFrame({"predicted": predicted_test, "actual": truth_test})
-df.to_csv("predicted_vs_actual3.csv", index=False)
+df.to_csv("predicted_vs_actual2.csv", index=False)
 
 error = np.array(predicted_test) - np.array(truth_test)
 print('Test RMSE:', np.sqrt(np.mean(error**2)))

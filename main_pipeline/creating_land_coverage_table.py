@@ -61,7 +61,7 @@ def generate_coord_overlap(bbox, geometry):
 
     # Extract pixel coordinates and areas
     #takes the bottom left corner of the pixel as the identifier.
-    pixels = np.array([coords[0]/ANGLE for coords in polygons_array]) # this/ANGLE to make it indexed by integer
+    pixels = np.array([coords[0]//ANGLE for coords in polygons_array]) # this/ANGLE to make it indexed by integer
     
     return pixels, intersection_areas.values
 
